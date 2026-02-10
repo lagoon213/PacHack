@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 
-public class PacManMovement : MonoBehaviour
+public class GhostMovement : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private Transform visual;
@@ -11,7 +11,6 @@ public class PacManMovement : MonoBehaviour
     public Tilemap Walls;
     public Tilemap Ghost_Room;
     public Tilemap Ghost_Door;
-    public Tilemap Pellets;
 
     public float moveSpeed = 5f; //Later this will be a "hackable" speed 
 
@@ -49,19 +48,12 @@ public class PacManMovement : MonoBehaviour
                 var nextCell = currentCell + new Vector3Int(_currentDir.x, _currentDir.y, 0);
                 _targetWorldPos = Walls.GetCellCenterWorld(nextCell);
             }
-
-            var cell = Pellets.WorldToCell(transform.position);
-            if (Pellets.HasTile(cell)){
-                Pellets.SetTile(cell, null);
-            }
         }
 
         transform.position = Vector3.MoveTowards(transform.position, _targetWorldPos, moveSpeed * Time.deltaTime);
 
-        UpdateFacing();
-
-        bool isMoving = _currentDir != Vector2Int.zero;
-        animator.speed = isMoving ? 1f : 0f;
+        animator.SetFloat("MoveX", _currentDir.x);
+        animator.SetFloat("MoveY", _currentDir.y);
     }
 
     public void OnMove(InputValue value){
@@ -88,13 +80,5 @@ public class PacManMovement : MonoBehaviour
         if (Walls.HasTile(nextCell) || Ghost_Door.HasTile(nextCell) || Ghost_Room.HasTile(nextCell)) return false;
 
         return true;
-    }
-
-    private void UpdateFacing()
-    {
-        if (_currentDir == Vector2Int.right) visual.rotation = Quaternion.Euler(0, 0, 0);
-        else if (_currentDir == Vector2Int.up) visual.rotation = Quaternion.Euler(0, 0, 90);
-        else if (_currentDir == Vector2Int.left) visual.rotation = Quaternion.Euler(0, 0, 180);
-        else if (_currentDir == Vector2Int.down) visual.rotation = Quaternion.Euler(0, 0, -90);
     }
 }
