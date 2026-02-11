@@ -97,4 +97,6 @@ public class PacManMovement : MonoBehaviour
         else if (_currentDir == Vector2Int.left) visual.rotation = Quaternion.Euler(0, 0, 180);
         else if (_currentDir == Vector2Int.down) visual.rotation = Quaternion.Euler(0, 0, -90);
     }
+
+    public Vector2Int CurrentDir => _currentDir;
 }

@@ -6,6 +6,7 @@ public class GhostMovement : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [SerializeField] private Transform visual;
+    [SerializeField] private PacManMovement pacman;
     
 
     public Tilemap Walls;
@@ -21,6 +22,11 @@ public class GhostMovement : MonoBehaviour
 
     public Vector3 _targetWorldPos;
 
+    private static readonly Vector2Int[] PriorityDirs = new Vector2Int[]
+    {
+        Vector2Int.up, Vector2Int.left, Vector2Int.down, Vector2Int.right
+    };
+
     void Start()
     {
         var cell = Walls.WorldToCell(transform.position);
@@ -30,10 +36,11 @@ public class GhostMovement : MonoBehaviour
 
     void Update()
     {
-        ReadInput();
-
         if (Vector3.Distance(transform.position, _targetWorldPos) < 0.001f){
             transform.position = _targetWorldPos;
+
+            Vector2Int targetTile = GetPinkyChaseTargetTile();
+            _desiredDir = ChooseDirTowardTarget(targetTile);
 
             if (CanMove(_desiredDir)){
                 _currentDir = _desiredDir;
@@ -56,19 +63,61 @@ public class GhostMovement : MonoBehaviour
         animator.SetFloat("MoveY", _currentDir.y);
     }
 
-    public void OnMove(InputValue value){
-        _moveInput = value.Get<Vector2>();
+        private Vector2Int GetPinkyChaseTargetTile()
+    {
+        // Pac-Man tile
+        Vector3Int pacCell3 = Walls.WorldToCell(pacman.transform.position);
+        Vector2Int pacCell = new Vector2Int(pacCell3.x, pacCell3.y);
+
+        // Pac-Man direction
+        Vector2Int pacDir = pacman.CurrentDir;
+        if (pacDir == Vector2Int.zero) pacDir = Vector2Int.right; // fallback
+
+        // Target 4 tiles ahead
+        Vector2Int target = pacCell + pacDir * 4;
+
+        // (OPTIONEEL) Classic Pinky bug: wanneer Pac-Man UP kijkt, target verschuift ook 4 naar links.
+        // Uncomment voor “echte” arcade feel:
+        // if (pacDir == Vector2Int.up) target += Vector2Int.left * 4;
+
+        return target;
     }
 
-    private void ReadInput(){
-        int x = Mathf.RoundToInt(_moveInput.x);
-        int y = Mathf.RoundToInt(_moveInput.y);
+    private Vector2Int ChooseDirTowardTarget(Vector2Int targetTile)
+    {
+        Vector3Int myCell3 = Walls.WorldToCell(transform.position);
+        Vector2Int myCell = new Vector2Int(myCell3.x, myCell3.y);
 
-        if (x != 0) y=0;
+        Vector2Int bestDir = Vector2Int.zero;
+        int bestDist = int.MaxValue;
 
-        if (x != 0 || y != 0){
-            _desiredDir = new Vector2Int(x,y);
+        foreach (var dir in PriorityDirs)
+        {
+            // niet omdraaien tenzij je echt moet
+            if (_currentDir != Vector2Int.zero && dir == -_currentDir)
+                continue;
+
+            if (!CanMove(dir))
+                continue;
+
+            Vector2Int next = myCell + dir;
+
+            int dx = next.x - targetTile.x;
+            int dy = next.y - targetTile.y;
+            int dist = dx * dx + dy * dy; // squared distance
+
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                bestDir = dir;
+            }
         }
+
+        // Als alles geblokkeerd is behalve reverse, pak reverse
+        if (bestDir == Vector2Int.zero && _currentDir != Vector2Int.zero && CanMove(-_currentDir))
+            return -_currentDir;
+
+        return bestDir;
     }
 
     private bool CanMove(Vector2Int dir){
