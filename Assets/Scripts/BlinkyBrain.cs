@@ -1,16 +1,16 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public class BlinkyBrain : MonoBehaviour
+public class BlinkyBrain : GhostBrain
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private PacManMovement pacman;
+    [SerializeField] private Tilemap walls;
 
-    // Update is called once per frame
-    void Update()
+    public override Vector2Int GetDesiredDir(GhostMovement motor)
     {
-        
+        Vector3Int pacCell3 = walls.WorldToCell(pacman.transform.position);
+        Vector2Int target = new Vector2Int(pacCell3.x, pacCell3.y);
+
+        return ChooseDirTowardTarget(motor, walls, target);
     }
 }
