@@ -53,6 +53,7 @@ public class PacManMovement : MonoBehaviour
             var cell = Pellets.WorldToCell(transform.position);
             if (Pellets.HasTile(cell)){
                 Pellets.SetTile(cell, null);
+                ScoreManager.Instance.AddScore(10);
             }
         }
 
