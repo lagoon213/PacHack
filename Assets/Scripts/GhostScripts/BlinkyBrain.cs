@@ -1,16 +1,13 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class BlinkyBrain : GhostBrain
+public class BlinkyBrain : ScatterChaseBrain
 {
-    [SerializeField] private PacManMovement pacman;
-    [SerializeField] private Tilemap walls;
+    [SerializeField] private Transform pacman;
 
-    public override Vector2Int GetDesiredDir(GhostMovement motor)
+    protected override Vector2Int GetChaseTargetTile()
     {
-        Vector3Int pacCell3 = walls.WorldToCell(pacman.transform.position);
-        Vector2Int target = new Vector2Int(pacCell3.x, pacCell3.y);
-
-        return ChooseDirTowardTarget(motor, walls, target);
+        Vector3Int pacCell3 = walls.WorldToCell(pacman.position);
+        return new Vector2Int(pacCell3.x, pacCell3.y);
     }
 }

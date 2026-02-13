@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class PinkyBrain : GhostBrain
+public class PinkyBrain : ScatterChaseBrain
 {
-    [SerializeField] private PacManMovement pacman;
-    [SerializeField] private Tilemap walls;
+    [SerializeField] private PacManMovement pacman; 
 
-    public override Vector2Int GetDesiredDir(GhostMovement motor)
+    protected override Vector2Int GetChaseTargetTile()
     {
         Vector3Int pacCell3 = walls.WorldToCell(pacman.transform.position);
         Vector2Int pacCell = new Vector2Int(pacCell3.x, pacCell3.y);
@@ -14,9 +13,6 @@ public class PinkyBrain : GhostBrain
         Vector2Int dir = pacman.CurrentDir;
         if (dir == Vector2Int.zero) dir = Vector2Int.right;
 
-        Vector2Int target = pacCell + dir * 4;
-
-        return ChooseDirTowardTarget(motor, walls, target);
+        return pacCell + dir * 4;
     }
 }
-
