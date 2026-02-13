@@ -13,6 +13,8 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
 
     private void Start()
     {
+        pelletTiles.Clear();
+
         foreach (var pos in powerPelletTilemap.cellBounds.allPositionsWithin)
         {
             if (powerPelletTilemap.HasTile(pos))
@@ -20,6 +22,14 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
                 pelletTiles[pos] = powerPelletTilemap.GetTile(pos);
             }
         }
+    }
+
+    public void Consume(Vector3Int cell)
+    {
+        // haal uit cache zodat hij nooit meer terugkomt
+        pelletTiles.Remove(cell);
+        // zorg dat hij nu ook echt weg is
+        powerPelletTilemap.SetTile(cell, null);
     }
 
     private void Update()
