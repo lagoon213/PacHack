@@ -6320,7 +6320,6 @@ MonoBehaviour:
   Ghost_Door: {fileID: 1418883263}
   Pellets: {fileID: 262897450}
   moveSpeed: 5
-  _targetWorldPos: {x: 0, y: 0, z: 0}
 --- !u!4 &227185153
 Transform:
   m_ObjectHideFlags: 0
@@ -12622,7 +12621,7 @@ GameObject:
   - component: {fileID: 1066825741}
   - component: {fileID: 1066825740}
   m_Layer: 0
-  m_Name: Borders
+  m_Name: Tunnel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12718,6 +12717,86 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+  - first: {x: 10, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 11, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 12, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 13, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 32, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 33, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 34, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 35, y: -16, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 1
+      m_TileSpriteIndex: 0
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   - first: {x: 36, y: -16, z: 0}
     second:
       serializedVersion: 2
@@ -12732,15 +12811,15 @@ Tilemap:
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 2
+  - m_RefCount: 10
     m_Data: {fileID: 11400000, guid: ebf97c4583f7f4f4391a7d25e87b22b5, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 2
+  - m_RefCount: 10
     m_Data: {fileID: 8972242239788995745, guid: 738faa5efcf18d14e8d830008530469f, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
   m_TileMatrixArray:
-  - m_RefCount: 2
+  - m_RefCount: 10
     m_Data:
       e00: 1
       e01: 0
@@ -12759,7 +12838,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 2
+  - m_RefCount: 10
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 0
     m_Data: {r: 1.67e-43, g: 1.67e-43, b: 1.67e-43, a: 1.67e-43}
@@ -13186,12 +13265,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   animator: {fileID: 50204883}
+  pacman: {fileID: 227185151}
+  brain: {fileID: 1283118869}
+  modeController: {fileID: 277723834}
   Walls: {fileID: 6386656}
   Ghost_Room: {fileID: 1224470793}
   Ghost_Door: {fileID: 1418883263}
-  brain: {fileID: 1283118869}
-  modeController: {fileID: 277723834}
-  moveSpeed: 5
+  Tunnel: {fileID: 1066825741}
+  normalMultiplier: 0.75
+  frightenedMultiplier: 0.5
+  houseMultiplier: 0.45
+  tunnelMultiplier: 0.4
 --- !u!4 &1283118868
 Transform:
   m_ObjectHideFlags: 0
@@ -13725,12 +13809,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   animator: {fileID: 1399351520}
+  pacman: {fileID: 227185151}
+  brain: {fileID: 1716612341}
+  modeController: {fileID: 277723834}
   Walls: {fileID: 6386656}
   Ghost_Room: {fileID: 1224470793}
   Ghost_Door: {fileID: 1418883263}
-  brain: {fileID: 1716612341}
-  modeController: {fileID: 277723834}
-  moveSpeed: 5
+  Tunnel: {fileID: 1066825741}
+  normalMultiplier: 0.75
+  frightenedMultiplier: 0.5
+  houseMultiplier: 0.45
+  tunnelMultiplier: 0.4
 --- !u!114 &1716612339
 MonoBehaviour:
   m_ObjectHideFlags: 0
