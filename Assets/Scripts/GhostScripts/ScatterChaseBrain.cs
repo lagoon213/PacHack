@@ -85,7 +85,7 @@ public abstract class ScatterChaseBrain : GhostBrain
     /// Returns the scatter target tile coordinates for this ghost.
     /// Reads the target from scatterTargetTilemap once and caches it.
     /// </summary>
-    private Vector2Int GetScatterTargetTile()
+    protected Vector2Int GetScatterTargetTile()
     {
         if (_scatterCached)
             return _cachedScatterTarget;
