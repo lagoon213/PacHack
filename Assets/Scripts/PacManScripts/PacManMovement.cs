@@ -15,6 +15,8 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PacManMovement : MonoBehaviour
 {
+
+    public static event System.Action OnPelletEaten;
     /* =========================
      * Referenties
      * ========================= */
@@ -113,7 +115,10 @@ public class PacManMovement : MonoBehaviour
 
             var pelletCell = Pellets.WorldToCell(transform.position);
             if (Pellets.HasTile(pelletCell))
+            {
                 Pellets.SetTile(pelletCell, null);
+                OnPelletEaten?.Invoke();
+            }
         }
 
         /* =========================

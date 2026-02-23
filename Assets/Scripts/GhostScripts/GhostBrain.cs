@@ -7,6 +7,7 @@ using UnityEngine.Tilemaps;
 /// Taken:
 /// - Contract: bepaal gewenste richting
 /// - Helper: kies beste richting naar een target tile
+/// - House-logica: gedrag in ghost house (wachten / naar deur)
 /// </summary>
 public abstract class GhostBrain : MonoBehaviour
 {
@@ -32,9 +33,67 @@ public abstract class GhostBrain : MonoBehaviour
 
     /// <summary>
     /// Wordt aangeroepen als de ghost het midden van een tile bereikt.
-    /// Geeft de gewenste bewegingsrichting terug.
+    /// Handelt eerst ghost-house af, daarna normale AI.
     /// </summary>
-    public abstract Vector2Int GetDesiredDir(GhostMovement motor);
+    public virtual Vector2Int GetDesiredDir(GhostMovement motor)
+    {
+        // In ghost house → house gedrag
+        if (motor.InHouse)
+            return GetHouseDir(motor);
+
+        // Buiten → normale AI
+        return GetNormalDir(motor);
+    }
+
+    /// <summary>
+    /// Normale AI (buiten de ghost house).
+    /// Elke ghost (of base brain) implementeert dit zelf.
+    /// </summary>
+    protected abstract Vector2Int GetNormalDir(GhostMovement motor);
+
+    /* =========================
+     * Ghost house gedrag
+     * ========================= */
+
+    /// <summary>
+    /// Gedrag in ghost house:
+    /// - Niet vrij: simpel bouncen (up/down)
+    /// - Wel vrij: richting de deur tile
+    /// </summary>
+    protected virtual Vector2Int GetHouseDir(GhostMovement motor)
+    {
+        // Nog niet vrij → blijf bewegen in house
+        if (!motor.CanExitHouse)
+        {
+            if (motor.CanMove(Vector2Int.up))
+                return Vector2Int.up;
+
+            if (motor.CanMove(Vector2Int.down))
+                return Vector2Int.down;
+
+            return Vector2Int.zero;
+        }
+
+        // Vrijgegeven → ga naar de deur
+        Vector2Int doorTile = FindSingleTile(motor.Ghost_Door);
+        return ChooseDirTowardTarget(motor, motor.Walls, doorTile);
+    }
+
+    /// <summary>
+    /// Vindt de eerste/eenige tile in een tilemap (bv. ghost door).
+    /// </summary>
+    protected Vector2Int FindSingleTile(Tilemap map)
+    {
+        if (map == null) return Vector2Int.zero;
+
+        foreach (var pos in map.cellBounds.allPositionsWithin)
+        {
+            if (map.HasTile(pos))
+                return new Vector2Int(pos.x, pos.y);
+        }
+
+        return Vector2Int.zero;
+    }
 
     /* =========================
      * Gedeelde keuze-logica

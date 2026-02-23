@@ -12313,6 +12313,8 @@ MonoBehaviour:
   pacman: {fileID: 227185151}
   brain: {fileID: 572829516}
   modeController: {fileID: 277723834}
+  startInHouse: 1
+  startCanExitHouse: 0
   Walls: {fileID: 6386656}
   Ghost_Room: {fileID: 1224470793}
   Ghost_Door: {fileID: 1418883263}
@@ -12330,7 +12332,7 @@ Transform:
   m_GameObject: {fileID: 572829515}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 21.37, y: -12.47, z: 0}
+  m_LocalPosition: {x: 21.06, y: -15.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12849,6 +12851,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   powerPelletTilemap: {fileID: 810016858}
   blinkInterval: 0.25
+--- !u!1 &833827295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 833827297}
+  - component: {fileID: 833827296}
+  m_Layer: 0
+  m_Name: GameController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &833827296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833827295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df9867f2804889042b8d999bbb6c108f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  rules:
+  - ghost: {fileID: 1716612338}
+    pelletsNeeded: 16
+    released: 0
+  - ghost: {fileID: 1633016632}
+    pelletsNeeded: 32
+    released: 0
+  - ghost: {fileID: 572829518}
+    pelletsNeeded: 17
+    released: 0
+--- !u!4 &833827297
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833827295}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 21.36327, y: -12.25781, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1042109721
 GameObject:
   m_ObjectHideFlags: 0
@@ -12957,7 +13013,7 @@ Transform:
   m_GameObject: {fileID: 1042109721}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.17, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13591,6 +13647,8 @@ MonoBehaviour:
   pacman: {fileID: 227185151}
   brain: {fileID: 1283118869}
   modeController: {fileID: 277723834}
+  startInHouse: 0
+  startCanExitHouse: 0
   Walls: {fileID: 6386656}
   Ghost_Room: {fileID: 1224470793}
   Ghost_Door: {fileID: 1418883263}
@@ -13658,7 +13716,7 @@ Transform:
   m_GameObject: {fileID: 1399351518}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.14, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14135,6 +14193,8 @@ MonoBehaviour:
   pacman: {fileID: 227185151}
   brain: {fileID: 1633016630}
   modeController: {fileID: 277723834}
+  startInHouse: 1
+  startCanExitHouse: 0
   Walls: {fileID: 6386656}
   Ghost_Room: {fileID: 1224470793}
   Ghost_Door: {fileID: 1418883263}
@@ -14152,7 +14212,7 @@ Transform:
   m_GameObject: {fileID: 1633016629}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 19.83, y: -12.47, z: 0}
+  m_LocalPosition: {x: 24.91, y: -15.46, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14348,7 +14408,7 @@ Transform:
   m_GameObject: {fileID: 1712094792}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.23, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14382,7 +14442,7 @@ Transform:
   m_GameObject: {fileID: 1716612336}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24.84, y: -12.41, z: 0}
+  m_LocalPosition: {x: 22.95, y: -15.54, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -14405,6 +14465,8 @@ MonoBehaviour:
   pacman: {fileID: 227185151}
   brain: {fileID: 1716612341}
   modeController: {fileID: 277723834}
+  startInHouse: 1
+  startCanExitHouse: 0
   Walls: {fileID: 6386656}
   Ghost_Room: {fileID: 1224470793}
   Ghost_Door: {fileID: 1418883263}
@@ -14786,3 +14848,4 @@ SceneRoots:
   - {fileID: 277723835}
   - {fileID: 1633016633}
   - {fileID: 572829519}
+  - {fileID: 833827297}

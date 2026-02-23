@@ -54,7 +54,7 @@ public abstract class ScatterChaseBrain : GhostBrain
     /// Wordt aangeroepen wanneer de ghost het midden van een tile bereikt.
     /// Bepaalt de volgende bewegingsrichting.
     /// </summary>
-    public override Vector2Int GetDesiredDir(GhostMovement motor)
+    protected override Vector2Int GetNormalDir(GhostMovement motor)
     {
         // Frightened: willekeurige veilige richting
         if (modeController.CurrentMode == GhostMode.Frightened)
