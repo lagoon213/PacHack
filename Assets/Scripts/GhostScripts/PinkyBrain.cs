@@ -2,54 +2,47 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// AI brain for Pinky (the pink ghost).
+/// AI-brain voor Pinky (roze ghost).
 ///
-/// Pinky's behavior:
-/// - In Chase mode, Pinky targets a tile a few steps ahead of Pac-Man
-///   to "ambush" instead of directly following.
-/// - In Scatter mode, behavior is handled by ScatterChaseBrain.
-/// - In Frightened mode, behavior is handled by ScatterChaseBrain.
+/// Gedrag:
+/// - Chase: target een paar tiles vóór Pac-Man (ambush)
+/// - Scatter/Frightened: via ScatterChaseBrain
 ///
-/// Note:
-/// The original arcade version has a known quirk where targeting while moving "Up"
-/// shifts the target to the left as well. This implementation uses the common
-/// simplified version: 4 tiles directly ahead of Pac-Man's current direction.
+/// Deze versie gebruikt de vereenvoudigde logica:
+/// 4 tiles recht vooruit in Pac-Man zijn richting.
 /// </summary>
 public class PinkyBrain : ScatterChaseBrain
 {
     /* =========================
-     * References
+     * Referenties
      * ========================= */
 
     /// <summary>
-    /// Reference to Pac-Man movement, used for both position and current direction.
+    /// Pac-Man movement (positie + richting).
     /// </summary>
     [SerializeField] private PacManMovement pacman;
 
     /* =========================
-     * Chase Logic
+     * Chase logica
      * ========================= */
 
     /// <summary>
-    /// Returns Pinky's chase target tile.
-    /// 
-    /// Pinky aims for the tile 4 steps ahead of Pac-Man's current direction.
-    /// This produces a predictive, ambush-style chase pattern.
+    /// Bepaalt Pinky zijn chase target tile.
     /// </summary>
     protected override Vector2Int GetChaseTargetTile()
     {
-        // Convert Pac-Man's world position to tile coordinates
+        // Pac-Man world → tile-coördinaten
         Vector3Int pacCell3 = walls.WorldToCell(pacman.transform.position);
         Vector2Int pacCell = new Vector2Int(pacCell3.x, pacCell3.y);
 
-        // Use Pac-Man's current direction as prediction vector
+        // Richting waarin Pac-Man beweegt
         Vector2Int dir = pacman.CurrentDir;
 
-        // Fallback when Pac-Man is idle (prevents targeting "no direction")
+        // Fallback als Pac-Man stilstaat
         if (dir == Vector2Int.zero)
             dir = Vector2Int.right;
 
-        // Target 4 tiles ahead (predictive chase)
+        // Target 4 tiles vooruit (ambush)
         return pacCell + dir * 4;
     }
 }

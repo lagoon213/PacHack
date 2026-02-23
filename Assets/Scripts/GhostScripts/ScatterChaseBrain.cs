@@ -3,77 +3,70 @@ using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 
 /// <summary>
-/// Shared brain base for ghosts that use the classic Pac-Man mode system:
-/// - Scatter: target a fixed "corner" tile (per ghost)
-/// - Chase: target depends on the ghost type (Blinky/Pinky/etc.)
-/// - Frightened: choose a semi-random valid direction
+/// Basis-AI voor Pac-Man ghosts met modes:
+/// - Scatter: vaste hoek target
+/// - Chase: ghost-specifieke target
+/// - Frightened: semi-random beweging
 ///
-/// Responsibilities:
-/// - Resolve the current mode from GhostModeController
-/// - Select the appropriate target tile for Scatter/Chase
-/// - Provide a default frightened movement strategy
-///
-/// Concrete ghost brains only implement GetChaseTargetTile().
+/// Afgeleide classes implementeren alleen GetChaseTargetTile().
 /// </summary>
 public abstract class ScatterChaseBrain : GhostBrain
 {
     /* =========================
-     * References
+     * Referenties
      * ========================= */
 
     /// <summary>
-    /// Global controller that determines the current ghost mode (Scatter/Chase/Frightened).
+    /// Bepaalt de huidige ghost mode (Scatter / Chase / Frightened).
     /// </summary>
     [SerializeField] protected GhostModeController modeController;
 
     /// <summary>
-    /// Tilemap used for converting world positions to tile coordinates.
-    /// (Also used by ChooseDirTowardTarget for consistent grid logic.)
+    /// Wall tilemap voor grid-logica en WorldToCell conversies.
     /// </summary>
     [SerializeField] protected Tilemap walls;
 
     /// <summary>
-    /// Per-ghost scatter target tilemap.
-    /// This tilemap should contain exactly one tile that represents the ghost's
-    /// scatter corner/target position.
+    /// Tilemap met exact één tile:
+    /// de scatter-hoek van deze ghost.
     /// </summary>
     [SerializeField] protected Tilemap scatterTargetTilemap;
 
     /* =========================
-     * Cached scatter target
+     * Scatter target cache
      * ========================= */
 
     /// <summary>
-    /// Cached scatter target tile coordinates, read once from the scatterTargetTilemap.
+    /// Gecachte scatter target tile.
     /// </summary>
     private Vector2Int _cachedScatterTarget;
 
     /// <summary>
-    /// Indicates whether the scatter target has been cached already.
+    /// Geeft aan of de scatter target al is ingelezen.
     /// </summary>
     private bool _scatterCached;
 
     /* =========================
-     * Main decision entry point
+     * Hoofdlogica
      * ========================= */
 
     /// <summary>
-    /// Called by GhostMovement whenever the ghost reaches the center of a tile.
-    /// Decides which direction the ghost should take next.
+    /// Wordt aangeroepen wanneer de ghost het midden van een tile bereikt.
+    /// Bepaalt de volgende bewegingsrichting.
     /// </summary>
     public override Vector2Int GetDesiredDir(GhostMovement motor)
     {
-        // 1) Frightened mode: override normal targeting with random-ish movement
+        // Frightened: willekeurige veilige richting
         if (modeController.CurrentMode == GhostMode.Frightened)
             return GetFrightenedDir(motor);
 
-        // 2) Scatter/Chase: choose which target tile to steer toward
+        // Scatter of Chase: bepaal doel-tile
         Vector2Int targetTile =
             (modeController.CurrentMode == GhostMode.Scatter)
             ? GetScatterTargetTile()
             : GetChaseTargetTile();
 
-        // Use shared helper from GhostBrain to choose the best direction toward target
+        // Kies richting die het beste naar het doel leidt
         return ChooseDirTowardTarget(motor, walls, targetTile);
     }
 
@@ -82,15 +75,14 @@ public abstract class ScatterChaseBrain : GhostBrain
      * ========================= */
 
     /// <summary>
-    /// Returns the scatter target tile coordinates for this ghost.
-    /// Reads the target from scatterTargetTilemap once and caches it.
+    /// Leest éénmalig de scatter-hoek uit de tilemap
+    /// en cached het resultaat.
     /// </summary>
     protected Vector2Int GetScatterTargetTile()
     {
         if (_scatterCached)
             return _cachedScatterTarget;
 
-        // Search the tilemap bounds for the single scatter tile
         foreach (var pos in scatterTargetTilemap.cellBounds.allPositionsWithin)
         {
             if (scatterTargetTilemap.HasTile(pos))
@@ -101,54 +93,46 @@ public abstract class ScatterChaseBrain : GhostBrain
             }
         }
 
-        // Fallback: no tile found (misconfigured scene)
-        Debug.LogError($"{name}: scatterTargetTilemap has no tile!");
+        Debug.LogError($"{name}: scatterTargetTilemap bevat geen tile!");
         return Vector2Int.zero;
     }
 
     /* =========================
-     * Chase target (implemented per ghost type)
+     * Chase target
      * ========================= */
 
     /// <summary>
-    /// Returns the chase target tile for the specific ghost type.
-    /// Example:
-    /// - Blinky: Pac-Man's current tile
-    /// - Pinky: 4 tiles ahead of Pac-Man
-    /// - Inky/Clyde: custom rules
+    /// Geeft het chase-doel terug.
+    /// Wordt per ghost anders geïmplementeerd.
     /// </summary>
     protected abstract Vector2Int GetChaseTargetTile();
 
     /* =========================
-     * Frightened behavior
+     * Frightened gedrag
      * ========================= */
 
     /// <summary>
-    /// Default frightened behavior:
-    /// Choose a valid direction in a randomized order, avoiding immediate reversal
-    /// when possible. This mimics the "erratic" movement during frightened mode.
-    /// 
-    /// You can override this per ghost if you want more specific frightened logic.
+    /// Frightened gedrag:
+    /// - probeer richtingen in willekeurige volgorde
+    /// - vermijd direct omkeren als dat kan
     /// </summary>
     protected virtual Vector2Int GetFrightenedDir(GhostMovement motor)
     {
-        // Start at a random index so the evaluation order changes each decision
         int start = Random.Range(0, PriorityDirs.Length);
 
         for (int i = 0; i < PriorityDirs.Length; i++)
         {
             Vector2Int dir = PriorityDirs[(start + i) % PriorityDirs.Length];
 
-            // Avoid immediate reversal unless forced
+            // Vermijd 180° omkering
             if (motor.CurrentDir != Vector2Int.zero && dir == -motor.CurrentDir)
                 continue;
 
-            // Pick the first valid direction found
             if (motor.CanMove(dir))
                 return dir;
         }
 
-        // If no direction is valid, stop (should be rare in a well-formed maze)
+        // Geen geldige richting gevonden
         return Vector2Int.zero;
     }
 }

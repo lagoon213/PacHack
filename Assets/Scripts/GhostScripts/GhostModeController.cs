@@ -1,52 +1,47 @@
 using UnityEngine;
 
 /// <summary>
-/// Central controller that manages the global ghost behavior modes.
+/// Centrale controller voor ghost modes.
 ///
-/// Responsibilities:
-/// - Handle the Scatter / Chase timing phases
-/// - Temporarily override behavior with Frightened mode
-/// - Restore the correct mode after Frightened ends
-/// - Broadcast mode changes to all ghosts (e.g. for 180° turns)
-///
-/// This controller acts as the single source of truth for ghost modes.
+/// Regelt:
+/// - timing van Scatter/Chase fases
+/// - tijdelijke Frightened override
+/// - terugzetten naar vorige mode
+/// - event bij mode-wissel (o.a. 180° turn)
 /// </summary>
 public class GhostModeController : MonoBehaviour
 {
     /* =========================
-     * Phase configuration
+     * Fase-configuratie
      * ========================= */
 
     /// <summary>
-    /// Represents a timed Scatter or Chase phase.
-    /// Only these modes are configured in the inspector.
+    /// Eén Scatter/Chase fase met duur.
     /// </summary>
     [System.Serializable]
     public struct Phase
     {
-        public GhostMode mode;     // Scatter or Chase
-        public float duration;     // Duration in seconds
+        public GhostMode mode;   // Scatter of Chase
+        public float duration;   // seconden
     }
 
     /// <summary>
-    /// Event fired whenever the ghost mode changes.
-    /// Arguments: (oldMode, newMode)
-    /// Used by GhostMovement for 180° turn behavior.
+    /// Wordt gefired bij mode-wissel: (oud, nieuw).
     /// </summary>
     public System.Action<GhostMode, GhostMode> OnModeChanged;
 
     /// <summary>
-    /// Ordered list of Scatter / Chase phases for the current level.
-    /// After the final phase, ghosts remain in Chase permanently.
+    /// Volgorde van Scatter/Chase fases.
+    /// Na laatste fase blijft het Chase.
     /// </summary>
     [SerializeField] private Phase[] phases;
 
     /* =========================
-     * Current state
+     * Huidige state
      * ========================= */
 
     /// <summary>
-    /// The currently active global ghost mode.
+    /// Actieve globale ghost mode.
     /// </summary>
     public GhostMode CurrentMode { get; private set; }
 
@@ -54,7 +49,7 @@ public class GhostModeController : MonoBehaviour
     private float phaseTimer;
 
     /* =========================
-     * Frightened override state
+     * Frightened override
      * ========================= */
 
     private bool frightenedActive;
@@ -62,7 +57,7 @@ public class GhostModeController : MonoBehaviour
     private GhostMode modeBeforeFrightened;
 
     /* =========================
-     * Unity Lifecycle
+     * Unity lifecycle
      * ========================= */
 
     private void Start()
@@ -70,7 +65,7 @@ public class GhostModeController : MonoBehaviour
         phaseIndex = 0;
         phaseTimer = 0f;
 
-        // Initialize starting mode
+        // Start in eerste fase, anders direct Chase
         if (phases != null && phases.Length > 0)
             SetMode(phases[0].mode);
         else
@@ -80,10 +75,10 @@ public class GhostModeController : MonoBehaviour
     private void Update()
     {
         /* =========================
-         * Frightened override logic
+         * Frightened actief
          * ========================= */
 
-        // While frightened is active, suspend normal phase switching
+        // Tijdens frightened pauzeer je fase-timing
         if (frightenedActive)
         {
             frightenedTimer -= Time.deltaTime;
@@ -98,13 +93,13 @@ public class GhostModeController : MonoBehaviour
         }
 
         /* =========================
-         * Scatter / Chase phase logic
+         * Scatter/Chase fases
          * ========================= */
 
         if (phases == null || phases.Length == 0)
             return;
 
-        // If all phases are completed, remain in Chase permanently
+        // Klaar met fases: blijf in Chase
         if (phaseIndex >= phases.Length)
         {
             SetMode(GhostMode.Chase);
@@ -113,6 +108,7 @@ public class GhostModeController : MonoBehaviour
 
         phaseTimer += Time.deltaTime;
 
+        // Volgende fase als timer voorbij is
         if (phaseTimer >= phases[phaseIndex].duration)
         {
             phaseTimer = 0f;
@@ -121,7 +117,7 @@ public class GhostModeController : MonoBehaviour
             if (phaseIndex < phases.Length)
                 SetMode(phases[phaseIndex].mode);
             else
-                SetMode(GhostMode.Chase); // permanent Chase after final phase
+                SetMode(GhostMode.Chase); // permanent na laatste fase
         }
     }
 
@@ -130,16 +126,14 @@ public class GhostModeController : MonoBehaviour
      * ========================= */
 
     /// <summary>
-    /// Triggers Frightened mode for the given duration.
-    /// If already frightened, the timer is reset.
+    /// Zet Frightened aan voor 'duration' seconden.
+    /// Als al actief: timer reset.
     /// </summary>
     public void TriggerFrightened(float duration)
     {
-        // Store previous mode only the first time frightened is triggered
+        // Vorige mode alleen 1x opslaan
         if (!frightenedActive)
-        {
             modeBeforeFrightened = CurrentMode;
-        }
 
         frightenedActive = true;
         frightenedTimer = duration;
@@ -147,12 +141,11 @@ public class GhostModeController : MonoBehaviour
     }
 
     /* =========================
-     * Internal helpers
+     * Intern
      * ========================= */
 
     /// <summary>
-    /// Sets the current ghost mode and notifies listeners
-    /// if the mode has changed.
+    /// Zet mode en fire event als hij veranderd is.
     /// </summary>
     private void SetMode(GhostMode newMode)
     {
@@ -162,7 +155,6 @@ public class GhostModeController : MonoBehaviour
         var oldMode = CurrentMode;
         CurrentMode = newMode;
 
-        // Notify all subscribers of the mode change
         OnModeChanged?.Invoke(oldMode, CurrentMode);
     }
 }

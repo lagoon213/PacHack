@@ -2,18 +2,19 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// Handles all ghost movement logic:
-/// - Tile-based movement
-/// - Direction updates based on GhostBrain
-/// - Speed calculation relative to Pac-Man
-/// - Mode-based behavior (Scatter / Chase / Frightened)
-/// - 180-degree turn on Scatter ↔ Chase transitions
-/// - Animation parameter updates
+/// Ghost movement (tile-based).
+///
+/// Doet:
+/// - bewegen van tile naar tile
+/// - richting kiezen via GhostBrain
+/// - snelheid (multipliers)
+/// - 180° turn bij Scatter ↔ Chase switch
+/// - animatie params updaten
 /// </summary>
 public class GhostMovement : MonoBehaviour
 {
     /* =========================
-     * References
+     * Referenties
      * ========================= */
 
     [SerializeField] private Animator animator;
@@ -34,51 +35,50 @@ public class GhostMovement : MonoBehaviour
     [SerializeField] private Tilemap Tunnel;
 
     /* =========================
-     * Speed Multipliers
-     * (relative to Pac-Man speed)
+     * Snelheid-multipliers
      * ========================= */
 
     [Header("Speed Multipliers")]
-    [SerializeField] private float normalMultiplier = 0.75f;     // Scatter / Chase
+    [SerializeField] private float normalMultiplier = 0.75f;     // Scatter/Chase
     [SerializeField] private float frightenedMultiplier = 0.5f;  // Frightened
-    [SerializeField] private float houseMultiplier = 0.45f;      // Ghost room & door
-    [SerializeField] private float tunnelMultiplier = 0.4f;      // Tunnel slowdown
+    [SerializeField] private float houseMultiplier = 0.45f;      // Ghost house/door
+    [SerializeField] private float tunnelMultiplier = 0.4f;      // Tunnel
 
     /* =========================
-     * Runtime State
+     * Runtime state
      * ========================= */
 
     /// <summary>
-    /// Current movement direction in tile coordinates.
+    /// Huidige richting (tile coords).
     /// </summary>
     public Vector2Int CurrentDir { get; private set; } = Vector2Int.right;
 
     /// <summary>
-    /// World position of the next tile center the ghost is moving toward.
+    /// Volgende world positie (center van volgende tile).
     /// </summary>
     public Vector3 TargetWorldPos { get; private set; }
 
     /* =========================
-     * Unity Lifecycle
+     * Unity lifecycle
      * ========================= */
 
     private void OnEnable()
     {
-        // Subscribe to mode change events (for 180° turn logic)
+        // Luister naar mode-wissels (180° turn)
         if (modeController != null)
             modeController.OnModeChanged += HandleModeChanged;
     }
 
     private void OnDisable()
     {
-        // Unsubscribe to avoid memory leaks
+        // Unsubscribe (geen leaks)
         if (modeController != null)
             modeController.OnModeChanged -= HandleModeChanged;
     }
 
     private void Start()
     {
-        // Snap ghost to the center of its starting tile
+        // Start netjes in het midden van de tile
         var cell = Walls.WorldToCell(transform.position);
         TargetWorldPos = Walls.GetCellCenterWorld(cell);
         transform.position = TargetWorldPos;
@@ -87,25 +87,25 @@ public class GhostMovement : MonoBehaviour
     private void Update()
     {
         /* =========================
-         * Tile-based movement logic
+         * Tile-logica (richting kiezen)
          * ========================= */
 
-        // Only choose a new direction when we reach the center of a tile
+        // Alleen kiezen als we tile-center bereikt hebben
         if (Vector3.Distance(transform.position, TargetWorldPos) < 0.001f)
         {
             transform.position = TargetWorldPos;
 
-            // Ask the brain which direction it wants to go
+            // Brain kiest gewenste richting
             Vector2Int desiredDir = brain.GetDesiredDir(this);
 
             if (CanMove(desiredDir))
                 SetDir(desiredDir);
 
-            // If current direction becomes invalid, stop movement
+            // Als huidige richting niet meer kan: stop
             if (!CanMove(CurrentDir))
                 SetDir(Vector2Int.zero);
 
-            // Set the next tile target
+            // Volgende tile target zetten
             if (CurrentDir != Vector2Int.zero)
             {
                 var currentCell = Walls.WorldToCell(transform.position);
@@ -115,10 +115,10 @@ public class GhostMovement : MonoBehaviour
         }
 
         /* =========================
-         * Movement execution
+         * Beweging uitvoeren
          * ========================= */
 
-        // Ghost speed is derived from Pac-Man speed and current multipliers
+        // Snelheid = Pac-Man speed * multiplier
         float speed = pacman.MoveSpeed * GetSpeedMultiplier();
 
         transform.position = Vector3.MoveTowards(
@@ -128,13 +128,13 @@ public class GhostMovement : MonoBehaviour
         );
 
         /* =========================
-         * Animation parameters
+         * Animatie updaten
          * ========================= */
 
         animator.SetFloat("MoveX", CurrentDir.x);
         animator.SetFloat("MoveY", CurrentDir.y);
 
-        // Frightened animation override
+        // Frightened animatie aan/uit
         animator.SetBool(
             "IsFrightened",
             modeController != null &&
@@ -143,12 +143,11 @@ public class GhostMovement : MonoBehaviour
     }
 
     /* =========================
-     * Mode Change Handling
+     * Mode-wissel handling
      * ========================= */
 
     /// <summary>
-    /// Handles 180-degree turn when switching between Scatter and Chase.
-    /// This mimics classic Pac-Man behavior.
+    /// 180° turn bij Scatter ↔ Chase (classic gedrag).
     /// </summary>
     private void HandleModeChanged(GhostMode oldMode, GhostMode newMode)
     {
@@ -161,12 +160,12 @@ public class GhostMovement : MonoBehaviour
 
         Vector2Int reversed = -CurrentDir;
 
-        // Only reverse if the direction is valid (prevents wall jitter)
+        // Alleen omkeren als het kan (geen wall-jitter)
         if (CanMove(reversed))
         {
             SetDir(reversed);
 
-            // Force immediate retarget so the ghost reacts instantly
+            // Direct nieuwe target zodat reactie instant is
             var currentCell = Walls.WorldToCell(transform.position);
             var nextCell = currentCell + new Vector3Int(CurrentDir.x, CurrentDir.y, 0);
             TargetWorldPos = Walls.GetCellCenterWorld(nextCell);
@@ -178,16 +177,16 @@ public class GhostMovement : MonoBehaviour
      * ========================= */
 
     /// <summary>
-     /// Updates the current movement direction.
-     /// </summary>
+    /// Zet de huidige richting.
+    /// </summary>
     private void SetDir(Vector2Int dir)
     {
         CurrentDir = dir;
     }
 
     /// <summary>
-     /// Checks whether the ghost can move in the given direction.
-     /// </summary>
+    /// Check of de ghost die kant op kan (geen muur/door/room).
+    /// </summary>
     public bool CanMove(Vector2Int dir)
     {
         if (dir == Vector2Int.zero) return false;
@@ -195,7 +194,7 @@ public class GhostMovement : MonoBehaviour
         var currentCell = Walls.WorldToCell(transform.position);
         var nextCell = currentCell + new Vector3Int(dir.x, dir.y, 0);
 
-        // Block movement on walls, ghost doors, and ghost room tiles
+        // Block: walls + ghost door + ghost room
         if (Walls.HasTile(nextCell) ||
             (Ghost_Door != null && Ghost_Door.HasTile(nextCell)) ||
             (Ghost_Room != null && Ghost_Room.HasTile(nextCell)))
@@ -205,36 +204,31 @@ public class GhostMovement : MonoBehaviour
     }
 
     /// <summary>
-     /// Determines the correct speed multiplier based on:
-     /// - Ghost house / door tiles
-     /// - Tunnel tiles
-     /// - Current ghost mode
-     /// </summary>
+    /// Bepaalt multiplier op basis van tile + mode:
+    /// - house/door
+    /// - tunnel
+    /// - frightened
+    /// - default
+    /// </summary>
     private float GetSpeedMultiplier()
     {
         Vector3Int cell = Walls.WorldToCell(transform.position);
 
-        // 1) Ghost house & door slowdown
+        // House/door
         if ((Ghost_Room != null && Ghost_Room.HasTile(cell)) ||
             (Ghost_Door != null && Ghost_Door.HasTile(cell)))
-        {
             return houseMultiplier;
-        }
 
-        // 2) Tunnel slowdown
+        // Tunnel
         if (Tunnel != null && Tunnel.HasTile(cell))
-        {
             return tunnelMultiplier;
-        }
 
-        // 3) Frightened slowdown
+        // Frightened
         if (modeController != null &&
             modeController.CurrentMode == GhostMode.Frightened)
-        {
             return frightenedMultiplier;
-        }
 
-        // 4) Default (Scatter / Chase)
+        // Default
         return normalMultiplier;
     }
 }

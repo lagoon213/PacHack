@@ -1,40 +1,38 @@
 using UnityEngine;
 
 /// <summary>
-/// Represents the current behavioral mode of a ghost.
+/// Huidige gedragsmodus van een ghost.
 /// 
-/// The active GhostMode determines:
-/// - How the ghost selects its movement target
-/// - Which speed multipliers are applied
-/// - Which animations are played
+/// Bepaalt:
+/// - target-keuze
+/// - snelheid
+/// - animaties
 /// </summary>
 public enum GhostMode
 {
     /// <summary>
-    /// Scatter mode:
-    /// Ghosts target their individual corner tiles.
-    /// Used to periodically relieve pressure on the player.
+    /// Scatter:
+    /// ghost gaat naar zijn vaste hoek.
     /// </summary>
     Scatter,
 
     /// <summary>
-    /// Chase mode:
-    /// Ghosts actively pursue Pac-Man using their unique AI logic.
-    /// This is the primary threat state.
+    /// Chase:
+    /// ghost jaagt actief op Pac-Man.
     /// </summary>
     Chase,
 
     /// <summary>
-    /// Frightened mode:
-    /// Triggered when Pac-Man eats a power pellet.
-    /// Ghosts move erratically at reduced speed and can be eaten.
+    /// Frightened:
+    /// power pellet actief,
+    /// ghost beweegt traag en willekeurig.
     /// </summary>
     Frightened,
 
     /// <summary>
-    /// Returning mode (Eyes):
-    /// Activated after a ghost is eaten.
-    /// The ghost returns to the ghost house at high speed.
+    /// Returning (eyes):
+    /// ghost is opgegeten en keert terug
+    /// naar het ghost house.
     /// </summary>
     Returning
 }
