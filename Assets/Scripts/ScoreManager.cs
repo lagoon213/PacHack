@@ -26,7 +26,6 @@ public class ScoreManager : MonoBehaviour
     public void AddScore(int amount)
     {
         score += amount;
-
         // Update high score if broken
         if (score > highScore)
         {
@@ -39,4 +38,6 @@ public class ScoreManager : MonoBehaviour
     {
         score = 0;
     }
+
+    
 }

@@ -113,7 +113,10 @@ public class PacManMovement : MonoBehaviour
 
             var pelletCell = Pellets.WorldToCell(transform.position);
             if (Pellets.HasTile(pelletCell))
+            {
                 Pellets.SetTile(pelletCell, null);
+                ScoreManager.Instance.AddScore(10); //feel like this logic should be in pellet
+            }
         }
 
         /* =========================
