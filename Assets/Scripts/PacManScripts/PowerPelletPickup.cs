@@ -16,7 +16,7 @@ public class PowerPelletPickup : MonoBehaviour
     /* =========================
      * Referenties
      * ========================= */
-
+    public int points = 50; //decides how many points a power pellet is worth
     /// <summary>
     /// Tilemap met alle power pellets.
     /// </summary>
@@ -52,7 +52,7 @@ public class PowerPelletPickup : MonoBehaviour
         {
             // Pellet verwijderen (ook uit blink-cache)
             blink.Consume(cell);
-
+            GameManager.Instance.AddScore(points); 
             // Ghosts in Frightened mode zetten
             ghostModeController.TriggerFrightened(frightenedDuration);
         }

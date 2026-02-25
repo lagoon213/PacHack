@@ -64,8 +64,11 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
             if (powerPelletTilemap.HasTile(pos))
             {
                 pelletTiles[pos] = powerPelletTilemap.GetTile(pos);
+
+                powerPelletTilemap.SetTileFlags(pos, TileFlags.None); //try and allow color change
             }
         }
+        
     }
 
     /* =========================
@@ -99,13 +102,13 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
             visible = !visible;
 
             // Zichtbaarheid togglen voor resterende pellets
-            foreach (var kvp in pelletTiles)
-            {
-                powerPelletTilemap.SetTile(
-                    kvp.Key,
-                    visible ? kvp.Value : null
-                );
-            }
+           foreach (var kvp in pelletTiles)
+        {
+            powerPelletTilemap.SetColor(
+                kvp.Key,
+                visible ? new Color(1f, 1f, 1f, 1f) : new Color(1f, 1f, 1f, 0f)
+            );
+        }
         }
     }
 }
