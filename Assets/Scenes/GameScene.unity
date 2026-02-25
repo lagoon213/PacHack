@@ -6794,6 +6794,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d719cfc94c6184a967f434306233fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  points: 50
   powerPelletTilemap: {fileID: 810016858}
   blink: {fileID: 810016859}
   ghostModeController: {fileID: 277723834}
@@ -16053,6 +16054,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
   score: 0
   highScore: 0
+  pelletTilemap: {fileID: 262897450}
+  pelletsRemaining: 0
 --- !u!1 &2146158929
 GameObject:
   m_ObjectHideFlags: 0

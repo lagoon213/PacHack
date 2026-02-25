@@ -1,12 +1,17 @@
 using UnityEngine;
-
-public class ScoreManager : MonoBehaviour
+using UnityEngine.Tilemaps;
+public class GameManager : MonoBehaviour
 {
-    public static ScoreManager Instance;
+    public static GameManager Instance;
 
     public int score;
     public int highScore; // track the high score
-
+    public Tilemap pelletTilemap;
+    public int pelletsRemaining;
+    void Start()
+    {
+        CountPellets();
+    }
     void Awake()
     {
         if (Instance == null)
@@ -39,5 +44,42 @@ public class ScoreManager : MonoBehaviour
         score = 0;
     }
 
+    void CountPellets()
+    {
+        pelletsRemaining = 0;
+
+        BoundsInt bounds = pelletTilemap.cellBounds;
+
+        foreach (Vector3Int pos in bounds.allPositionsWithin)
+        {
+            if (pelletTilemap.HasTile(pos))
+            {
+                pelletsRemaining++;
+            }
+        }
+
+        Debug.Log("Pellets found: " + pelletsRemaining);
+    }
+
+    public void PelletEaten(Vector3 worldPosition)
+    {
+        Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
+
+        if (pelletTilemap.HasTile(cellPos))
+        {
+            pelletTilemap.SetTile(cellPos, null); // remove tile
+            pelletsRemaining--;
+
+            if (pelletsRemaining <= 0)
+            {
+                WinLevel();
+            }
+        }
+    }
+
+    void WinLevel()
+    {
+        Debug.Log("YOU WIN");
+    }
     
 }
