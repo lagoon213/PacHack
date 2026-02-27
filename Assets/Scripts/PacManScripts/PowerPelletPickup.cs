@@ -2,61 +2,58 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// Handles interaction between Pac-Man and power pellets.
-/// 
-/// Responsibilities:
-/// - Detect when Pac-Man enters a power pellet tile
-/// - Remove the power pellet from the tilemap
-/// - Notify the GhostModeController to trigger Frightened mode
-/// 
-/// This script should be placed on the Pac-Man GameObject.
+/// Afhandeling van power pellets.
+///
+/// Doet:
+/// - check of Pac-Man op een power pellet staat
+/// - verwijdert de pellet
+/// - zet ghosts in Frightened mode
+///
+/// Script hoort op Pac-Man.
 /// </summary>
 public class PowerPelletPickup : MonoBehaviour
 {
     /* =========================
-     * References
+     * Referenties
      * ========================= */
-
+    public int points = 50; //decides how many points a power pellet is worth
     /// <summary>
-    /// Tilemap that contains all power pellets.
+    /// Tilemap met alle power pellets.
     /// </summary>
     [SerializeField] private Tilemap powerPelletTilemap;
 
     /// <summary>
-    /// Reference to the blink controller responsible for
-    /// visually toggling power pellet tiles.
-    /// Used to permanently remove eaten pellets from the blink cache.
+    /// Regelt het knipperen van power pellets.
+    /// Verwijdert opgegeten pellets definitief.
     /// </summary>
     [SerializeField] private PowerPelletBlinkTilemap blink;
 
     /// <summary>
-    /// Central controller that manages ghost modes
-    /// (Scatter / Chase / Frightened).
+    /// Centrale ghost mode controller.
     /// </summary>
     [SerializeField] private GhostModeController ghostModeController;
 
     /// <summary>
-    /// Duration (in seconds) that ghosts remain in Frightened mode
-    /// after a power pellet is eaten.
+    /// Duur van Frightened mode (seconden).
     /// </summary>
     [SerializeField] private float frightenedDuration = 6f;
 
     /* =========================
-     * Unity Lifecycle
+     * Unity lifecycle
      * ========================= */
 
     private void Update()
     {
-        // Determine which tile Pac-Man is currently standing on
+        // Tile waar Pac-Man nu op staat
         Vector3Int cell = powerPelletTilemap.WorldToCell(transform.position);
 
-        // Check if a power pellet exists on this tile
+        // Staat hier een power pellet?
         if (powerPelletTilemap.HasTile(cell))
         {
-            // Remove the pellet visually and from the blink cache
+            // Pellet verwijderen (ook uit blink-cache)
             blink.Consume(cell);
-
-            // Trigger Frightened mode for all ghosts
+            ScoreManager.Instance.AddScore(points); 
+            // Ghosts in Frightened mode zetten
             ghostModeController.TriggerFrightened(frightenedDuration);
         }
     }

@@ -3,69 +3,72 @@ using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 
 /// <summary>
-/// Controls the blinking behavior of power pellets that are stored in a Tilemap.
+/// Knipper-logica voor power pellets (Tilemap).
 ///
-/// Responsibilities:
-/// - Cache all power pellet tiles at startup
-/// - Periodically toggle their visibility (blink effect)
-/// - Permanently remove pellets when they are consumed by Pac-Man
+/// Doet:
+/// - cachet alle power pellets bij start
+/// - laat pellets knipperen
+/// - verwijdert pellets permanent bij consumptie
 ///
-/// This script should be attached to the PowerPellets Tilemap GameObject.
+/// Script hoort op de PowerPellets Tilemap.
 /// </summary>
 public class PowerPelletBlinkTilemap : MonoBehaviour
 {
     /* =========================
-     * References & Settings
+     * Referenties & instellingen
      * ========================= */
 
     /// <summary>
-    /// Tilemap that contains the power pellet tiles.
+    /// Tilemap met power pellets.
     /// </summary>
     [SerializeField] private Tilemap powerPelletTilemap;
 
     /// <summary>
-    /// Time (in seconds) between visibility toggles.
-    /// Lower values result in faster blinking.
+    /// Tijd tussen knipperen (seconden).
+    /// Lager = sneller knipperen.
     /// </summary>
     [SerializeField] private float blinkInterval = 0.25f;
 
     /* =========================
-     * Runtime State
+     * Runtime state
      * ========================= */
 
     /// <summary>
-    /// Cache of all active power pellet tiles and their original TileBase.
-    /// Used to prevent eaten pellets from reappearing.
+    /// Cache van actieve pellets (positie → originele tile).
+    /// Opgegeten pellets komen niet terug.
     /// </summary>
     private Dictionary<Vector3Int, TileBase> pelletTiles = new();
 
     /// <summary>
-    /// Current visibility state of the pellets.
+    /// Huidige zichtbaarheid.
     /// </summary>
     private bool visible = true;
 
     /// <summary>
-    /// Timer used to control blinking intervals.
+    /// Timer voor knipper-interval.
     /// </summary>
     private float timer;
 
     /* =========================
-     * Unity Lifecycle
+     * Unity lifecycle
      * ========================= */
 
     private void Start()
     {
-        // Clear cache in case of scene reload or reinitialization
+        // Cache leegmaken (veilig bij reload)
         pelletTiles.Clear();
 
-        // Cache all power pellet tiles at startup
+        // Alle power pellets cachen
         foreach (var pos in powerPelletTilemap.cellBounds.allPositionsWithin)
         {
             if (powerPelletTilemap.HasTile(pos))
             {
                 pelletTiles[pos] = powerPelletTilemap.GetTile(pos);
+
+                powerPelletTilemap.SetTileFlags(pos, TileFlags.None); //try and allow color change
             }
         }
+        
     }
 
     /* =========================
@@ -73,20 +76,20 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
      * ========================= */
 
     /// <summary>
-    /// Permanently removes a power pellet from the tilemap and cache.
-    /// Called when Pac-Man consumes a power pellet.
+    /// Verwijdert een power pellet permanent.
+    /// Aangeroepen wanneer Pac-Man hem opeet.
     /// </summary>
     public void Consume(Vector3Int cell)
     {
-        // Remove from cache so it will never blink again
+        // Uit cache halen (knippert nooit meer)
         pelletTiles.Remove(cell);
 
-        // Ensure the tile is removed visually
+        // Visueel verwijderen
         powerPelletTilemap.SetTile(cell, null);
     }
 
     /* =========================
-     * Update Loop
+     * Update loop
      * ========================= */
 
     private void Update()
@@ -98,14 +101,14 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
             timer = 0f;
             visible = !visible;
 
-            // Toggle visibility for all remaining power pellets
-            foreach (var kvp in pelletTiles)
-            {
-                powerPelletTilemap.SetTile(
-                    kvp.Key,
-                    visible ? kvp.Value : null
-                );
-            }
+            // Zichtbaarheid togglen voor resterende pellets
+           foreach (var kvp in pelletTiles)
+        {
+            powerPelletTilemap.SetColor(
+                kvp.Key,
+                visible ? new Color(1f, 1f, 1f, 1f) : new Color(1f, 1f, 1f, 0f)
+            );
+        }
         }
     }
 }

@@ -3,19 +3,22 @@ using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Handles Pac-Man movement and interaction:
-/// - Tile-based grid movement
-/// - Input handling (new Input System)
-/// - Wall / ghost-room collision
-/// - Pellet consumption
-/// - Visual rotation and animation control
-/// 
-/// Pac-Man acts as the speed baseline for all ghosts.
+/// Pac-Man movement (tile-based).
+///
+/// Doet:
+/// - grid movement + input (New Input System)
+/// - botsing met walls/ghost house
+/// - pellets opeten
+/// - visual draaien + animatie pauzeren
+///
+/// Pac-Man speed is de basis voor ghost speed.
 /// </summary>
 public class PacManMovement : MonoBehaviour
 {
+
+    public static event System.Action OnPelletEaten;
     /* =========================
-     * References
+     * Referenties
      * ========================= */
 
     [SerializeField] private Animator animator;
@@ -37,8 +40,7 @@ public class PacManMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     /// <summary>
-    /// Public read-only access to Pac-Man speed.
-    /// Used as baseline for ghost movement.
+    /// Pac-Man snelheid (ghosts gebruiken dit als baseline).
     /// </summary>
     public float MoveSpeed => moveSpeed;
 
@@ -47,32 +49,32 @@ public class PacManMovement : MonoBehaviour
      * ========================= */
 
     /// <summary>
-    /// Current movement direction in tile coordinates.
+    /// Huidige richting (tile coords).
     /// </summary>
     private Vector2Int _currentDir = Vector2Int.right;
 
     /// <summary>
-    /// Direction requested by player input.
+    /// Richting die de speler probeert te pakken.
     /// </summary>
     private Vector2Int _desiredDir = Vector2Int.right;
 
     /// <summary>
-    /// Raw input vector from the Input System.
+    /// Raw input vector (Input System).
     /// </summary>
     private Vector2 _moveInput;
 
     /// <summary>
-    /// World-space position of the next tile center.
+    /// Volgende world target (center van volgende tile).
     /// </summary>
     private Vector3 _targetWorldPos;
 
     /* =========================
-     * Unity Lifecycle
+     * Unity lifecycle
      * ========================= */
 
     private void Start()
     {
-        // Snap Pac-Man to the center of the starting tile
+        // Start in het midden van de tile
         var cell = Walls.WorldToCell(transform.position);
         _targetWorldPos = Walls.GetCellCenterWorld(cell);
         transform.position = _targetWorldPos;
@@ -83,27 +85,23 @@ public class PacManMovement : MonoBehaviour
         ReadInput();
 
         /* =========================
-         * Tile-based movement logic
+         * Tile-logica
          * ========================= */
 
-        // Only update direction when we reach the center of a tile
+        // Alleen wisselen als we tile-center bereikt hebben
         if (Vector3.Distance(transform.position, _targetWorldPos) < 0.001f)
         {
             transform.position = _targetWorldPos;
 
-            // Try to apply desired input direction
+            // Probeer gewenste richting toe te passen
             if (CanMove(_desiredDir))
-            {
                 _currentDir = _desiredDir;
-            }
 
-            // Stop movement if current direction becomes blocked
+            // Als je niet meer vooruit kan: stop
             if (!CanMove(_currentDir))
-            {
                 _currentDir = Vector2Int.zero;
-            }
 
-            // Set the next tile target
+            // Volgende tile target zetten
             if (_currentDir != Vector2Int.zero)
             {
                 var currentCell = Walls.WorldToCell(transform.position);
@@ -112,18 +110,20 @@ public class PacManMovement : MonoBehaviour
             }
 
             /* =========================
-             * Pellet consumption
+             * Pellets opeten
              * ========================= */
 
             var pelletCell = Pellets.WorldToCell(transform.position);
             if (Pellets.HasTile(pelletCell))
             {
-                Pellets.SetTile(pelletCell, null);
+                //Pellets.SetTile(pelletCell, null);
+                ScoreManager.Instance.AddScore(10); //feel like this logic should be in pellet
+                ScoreManager.Instance.PelletEaten(transform.position);
             }
         }
 
         /* =========================
-         * Movement execution
+         * Beweging uitvoeren
          * ========================= */
 
         transform.position = Vector3.MoveTowards(
@@ -133,22 +133,22 @@ public class PacManMovement : MonoBehaviour
         );
 
         /* =========================
-         * Visual & animation updates
+         * Visual + animatie
          * ========================= */
 
         UpdateFacing();
 
-        // Pause animation when Pac-Man is not moving
+        // Animatie pauze als je stilstaat
         bool isMoving = _currentDir != Vector2Int.zero;
         animator.speed = isMoving ? 1f : 0f;
     }
 
     /* =========================
-     * Input Handling
+     * Input
      * ========================= */
 
     /// <summary>
-    /// Called by the Input System when movement input is received.
+    /// Input System callback.
     /// </summary>
     public void OnMove(InputValue value)
     {
@@ -156,30 +156,26 @@ public class PacManMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Converts raw input into a valid grid direction.
-    /// Prevents diagonal movement.
+    /// Input → grid richting (geen diagonalen).
     /// </summary>
     private void ReadInput()
     {
         int x = Mathf.RoundToInt(_moveInput.x);
         int y = Mathf.RoundToInt(_moveInput.y);
 
-        // Prevent diagonal movement (horizontal has priority)
+        // Geen diagonaal (horizontaal wint)
         if (x != 0) y = 0;
 
         if (x != 0 || y != 0)
-        {
             _desiredDir = new Vector2Int(x, y);
-        }
     }
 
     /* =========================
-     * Collision & helpers
+     * Helpers
      * ========================= */
 
     /// <summary>
-    /// Checks whether Pac-Man can move in the given direction.
-    /// Blocks walls, ghost room, and ghost door tiles.
+    /// Check of Pac-Man die kant op mag (walls/door/room blokkeren).
     /// </summary>
     private bool CanMove(Vector2Int dir)
     {
@@ -191,15 +187,13 @@ public class PacManMovement : MonoBehaviour
         if (Walls.HasTile(nextCell) ||
             Ghost_Door.HasTile(nextCell) ||
             Ghost_Room.HasTile(nextCell))
-        {
             return false;
-        }
 
         return true;
     }
 
     /// <summary>
-    /// Rotates the visual child object to face the current movement direction.
+    /// Draai de visual naar de huidige richting.
     /// </summary>
     private void UpdateFacing()
     {
@@ -214,7 +208,7 @@ public class PacManMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Exposes Pac-Man's current direction for ghost AI (e.g. Pinky).
+    /// Huidige richting (voor ghost AI zoals Pinky).
     /// </summary>
     public Vector2Int CurrentDir => _currentDir;
 }

@@ -2,44 +2,40 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// AI brain for Blinky (the red ghost).
+/// AI-brain voor Blinky (rode ghost).
 ///
-/// Blinky's behavior:
-/// - In Chase mode, he directly targets Pac-Man's current tile
-/// - In Scatter mode, behavior is handled by ScatterChaseBrain
-/// - In Frightened mode, behavior is handled by ScatterChaseBrain
+/// Gedrag:
+/// - Chase: target altijd Pac-Man zijn huidige tile
+/// - Scatter: via ScatterChaseBrain
+/// - Frightened: via ScatterChaseBrain
 ///
-/// This makes Blinky the most aggressive ghost,
-/// as he always homes in on Pac-Man's exact position.
+/// Blinky is de meest agressieve ghost.
 /// </summary>
 public class BlinkyBrain : ScatterChaseBrain
 {
     /* =========================
-     * References
+     * Referenties
      * ========================= */
 
     /// <summary>
-    /// Reference to Pac-Man's transform.
-    /// Used to determine Pac-Man's current tile position.
+    /// Transform van Pac-Man.
     /// </summary>
     [SerializeField] private Transform pacman;
 
     /* =========================
-     * Chase Logic
+     * Chase logica
      * ========================= */
 
     /// <summary>
-    /// Returns the target tile Blinky should chase.
-    /// 
-    /// Blinky always targets Pac-Man's current tile,
-    /// making him the most direct and aggressive ghost.
+    /// Geeft de chase target tile terug.
+    /// Blinky jaagt direct op Pac-Man.
     /// </summary>
     protected override Vector2Int GetChaseTargetTile()
     {
-        // Convert Pac-Man's world position to tile coordinates
-        Vector3Int pacCell3 = walls.WorldToCell(pacman.position);
+        // Zet Pac-Man world positie om naar tile-coördinaten
+        Vector3Int pacCell = walls.WorldToCell(pacman.position);
 
-        // Use Pac-Man's exact tile as chase target
-        return new Vector2Int(pacCell3.x, pacCell3.y);
+        // Gebruik Pac-Man zijn huidige tile als target
+        return new Vector2Int(pacCell.x, pacCell.y);
     }
 }

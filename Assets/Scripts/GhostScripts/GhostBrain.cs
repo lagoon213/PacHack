@@ -2,26 +2,22 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// Base class for all ghost AI brains.
+/// Basis-klasse voor alle ghost AI brains.
 ///
-/// Responsibilities:
-/// - Define the contract for deciding a movement direction
-/// - Provide shared helper logic for choosing a direction toward a target tile
-///
-/// Concrete ghost brains (Blinky, Pinky, Inky, Clyde) should inherit from this
-/// and only implement their specific targeting logic.
+/// Taken:
+/// - Contract: bepaal gewenste richting
+/// - Helper: kies beste richting naar een target tile
+/// - House-logica: gedrag in ghost house (wachten / naar deur)
 /// </summary>
 public abstract class GhostBrain : MonoBehaviour
 {
     /* =========================
-     * Direction priority
+     * Richting-prioriteit
      * ========================= */
 
     /// <summary>
-    /// Direction priority order used when multiple paths have equal distance.
-    /// 
-    /// This order mimics classic Pac-Man behavior:
-    /// Up → Left → Down → Right.
+    /// Tie-break volgorde bij gelijke afstand:
+    /// Up → Left → Down → Right (klassieke Pac-Man).
     /// </summary>
     protected static readonly Vector2Int[] PriorityDirs =
     {
@@ -36,34 +32,81 @@ public abstract class GhostBrain : MonoBehaviour
      * ========================= */
 
     /// <summary>
-    /// Determines the desired movement direction for the ghost.
-    /// 
-    /// This method is called by GhostMovement whenever the ghost
-    /// reaches the center of a tile.
+    /// Wordt aangeroepen als de ghost het midden van een tile bereikt.
+    /// Handelt eerst ghost-house af, daarna normale AI.
     /// </summary>
-    /// <param name="motor">
-    /// Reference to the GhostMovement component, providing
-    /// information such as current direction and valid movement checks.
-    /// </param>
-    /// <returns>
-    /// The direction the ghost would like to move in.
-    /// </returns>
-    public abstract Vector2Int GetDesiredDir(GhostMovement motor);
+    public virtual Vector2Int GetDesiredDir(GhostMovement motor)
+    {
+        // In ghost house → house gedrag
+        if (motor.InHouse)
+            return GetHouseDir(motor);
+
+        // Buiten → normale AI
+        return GetNormalDir(motor);
+    }
+
+    /// <summary>
+    /// Normale AI (buiten de ghost house).
+    /// Elke ghost (of base brain) implementeert dit zelf.
+    /// </summary>
+    protected abstract Vector2Int GetNormalDir(GhostMovement motor);
 
     /* =========================
-     * Shared pathfinding logic
+     * Ghost house gedrag
      * ========================= */
 
     /// <summary>
-    /// Chooses the best direction that moves the ghost closer to a target tile.
-    /// 
-    /// Algorithm:
-    /// - Evaluate all valid directions except immediate reversal
-    /// - Measure squared distance from the next tile to the target tile
-    /// - Select the direction with the smallest distance
-    /// - Use PriorityDirs to break ties deterministically
-    /// 
-    /// This matches the original Pac-Man ghost decision logic.
+    /// Gedrag in ghost house:
+    /// - Niet vrij: simpel bouncen (up/down)
+    /// - Wel vrij: richting de deur tile
+    /// </summary>
+    protected virtual Vector2Int GetHouseDir(GhostMovement motor)
+    {
+        // Nog niet vrij → blijf bewegen in house
+        if (!motor.CanExitHouse)
+        {
+            if (motor.CanMove(Vector2Int.up))
+                return Vector2Int.up;
+
+            if (motor.CanMove(Vector2Int.down))
+                return Vector2Int.down;
+
+            return Vector2Int.zero;
+        }
+
+        // Vrijgegeven → ga naar de deur
+        Vector2Int doorTile = FindSingleTile(motor.Ghost_Door);
+        return ChooseDirTowardTarget(motor, motor.Walls, doorTile);
+    }
+
+    /// <summary>
+    /// Vindt de eerste/eenige tile in een tilemap (bv. ghost door).
+    /// </summary>
+    protected Vector2Int FindSingleTile(Tilemap map)
+    {
+        if (map == null) return Vector2Int.zero;
+
+        foreach (var pos in map.cellBounds.allPositionsWithin)
+        {
+            if (map.HasTile(pos))
+                return new Vector2Int(pos.x, pos.y);
+        }
+
+        return Vector2Int.zero;
+    }
+
+    /* =========================
+     * Gedeelde keuze-logica
+     * ========================= */
+
+    /// <summary>
+    /// Kiest de richting die het dichtst bij de target tile komt.
+    ///
+    /// Regels:
+    /// - geen directe 180° omkering (tenzij nodig)
+    /// - alleen geldige richtingen (CanMove)
+    /// - kies kleinste squared distance (snel)
+    /// - PriorityDirs bepaalt tie-break
     /// </summary>
     protected Vector2Int ChooseDirTowardTarget(
         GhostMovement motor,
@@ -71,7 +114,7 @@ public abstract class GhostBrain : MonoBehaviour
         Vector2Int targetTile
     )
     {
-        // Current ghost tile position
+        // Huidige tile van de ghost
         Vector3Int myCell3 = walls.WorldToCell(motor.transform.position);
         Vector2Int myCell = new Vector2Int(myCell3.x, myCell3.y);
 
@@ -80,23 +123,23 @@ public abstract class GhostBrain : MonoBehaviour
 
         foreach (var dir in PriorityDirs)
         {
-            // Prevent immediate reversal unless forced
+            // Vermijd directe omkering
             if (motor.CurrentDir != Vector2Int.zero && dir == -motor.CurrentDir)
                 continue;
 
-            // Skip directions blocked by walls or invalid tiles
+            // Skip als je daar niet heen kan
             if (!motor.CanMove(dir))
                 continue;
 
-            // Evaluate next tile in this direction
+            // Volgende tile in deze richting
             Vector2Int next = myCell + dir;
 
-            // Squared distance to target (faster than Vector2.Distance)
+            // Squared distance naar target
             int dx = next.x - targetTile.x;
             int dy = next.y - targetTile.y;
             int dist = dx * dx + dy * dy;
 
-            // Keep the direction that minimizes distance
+            // Beste (kleinste) afstand bewaren
             if (dist < bestDist)
             {
                 bestDist = dist;
