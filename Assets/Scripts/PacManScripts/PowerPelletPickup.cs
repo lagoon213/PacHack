@@ -52,7 +52,7 @@ public class PowerPelletPickup : MonoBehaviour
         {
             // Pellet verwijderen (ook uit blink-cache)
             blink.Consume(cell);
-            GameManager.Instance.AddScore(points); 
+            ScoreManager.Instance.AddScore(points); 
             // Ghosts in Frightened mode zetten
             ghostModeController.TriggerFrightened(frightenedDuration);
         }

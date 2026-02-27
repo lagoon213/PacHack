@@ -9,7 +9,7 @@ public class ScoreDisplay : MonoBehaviour
 
     void Update()
     {
-        int value = displayHighScore ? GameManager.Instance.highScore : GameManager.Instance.score;
+        int value = displayHighScore ? ScoreManager.Instance.highScore : ScoreManager.Instance.score;
         UpdateScore(value);
     }
 
