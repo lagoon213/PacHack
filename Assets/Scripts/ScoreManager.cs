@@ -62,20 +62,20 @@ public class ScoreManager : MonoBehaviour
     }
 
     public void PelletEaten(Vector3 worldPosition)
-    {
-        Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
+{
+    Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
 
-        if (pelletTilemap.HasTile(cellPos))
-        {
-            pelletTilemap.SetTile(cellPos, null); // remove tile
-            pelletsRemaining--;
+    if (!pelletTilemap.HasTile(cellPos))
+        return; // safety guard
 
-            if (pelletsRemaining <= 0)
-            {
-                WinLevel();
-            }
-        }
-    }
+    pelletTilemap.SetTile(cellPos, null);
+    pelletsRemaining--;
+
+    AddScore(10); // SCORE GOES HERE
+
+    if (pelletsRemaining <= 0)
+        WinLevel();
+}
 
     void WinLevel()
     {
