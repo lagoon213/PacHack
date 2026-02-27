@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
-public class GameManager : MonoBehaviour
+public class ScoreManager : MonoBehaviour
 {
-    public static GameManager Instance;
+    public static ScoreManager Instance;
 
     public int score;
     public int highScore; // track the high score

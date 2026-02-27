@@ -115,8 +115,8 @@ public class PacManMovement : MonoBehaviour
             if (Pellets.HasTile(pelletCell))
             {
                 //Pellets.SetTile(pelletCell, null);
-                GameManager.Instance.AddScore(10); //feel like this logic should be in pellet
-                GameManager.Instance.PelletEaten(transform.position);
+                ScoreManager.Instance.AddScore(10); //feel like this logic should be in pellet
+                ScoreManager.Instance.PelletEaten(transform.position);
             }
         }
 
