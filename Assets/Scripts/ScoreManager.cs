@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -11,7 +12,6 @@ public class ScoreManager : MonoBehaviour
     public int score;
     public int highScore;
 
-    [Header("Pellet Tilemap")]
     public Tilemap pelletTilemap;
     public int pelletsRemaining;
 
@@ -31,9 +31,42 @@ public class ScoreManager : MonoBehaviour
         highScore = PlayerPrefs.GetInt("HighScore", 0);
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     private void Start()
     {
-        CountPellets();
+        // eerste scene
+        RefreshPelletTilemapAndCount();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // na restart / scene reload
+        RefreshPelletTilemapAndCount();
+    }
+
+    private void RefreshPelletTilemapAndCount()
+    {
+        // Zoek opnieuw de pellet tilemap als die missing is
+        if (pelletTilemap == null)
+        {
+            var go = GameObject.Find("Pellets"); // zet dit gelijk aan jouw GameObject naam
+            if (go != null)
+                pelletTilemap = go.GetComponent<Tilemap>();
+        }
+
+        if (pelletTilemap != null)
+            CountPellets();
+        else
+            Debug.LogWarning("ScoreManager: pelletTilemap niet gevonden. Check GameObject naam ('Pellets').");
     }
 
     public void AddScore(int amount)
@@ -70,23 +103,18 @@ public class ScoreManager : MonoBehaviour
     // 🟡 SINGLE SOURCE OF TRUTH
     public void PelletEaten(Vector3 worldPosition)
     {
+        if (pelletTilemap == null) return;
+
         Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
 
-        if (!pelletTilemap.HasTile(cellPos))
-            return;
+        if (pelletTilemap.HasTile(cellPos))
+        {
+            pelletTilemap.SetTile(cellPos, null);
+            pelletsRemaining--;
 
-        // Remove pellet
-        pelletTilemap.SetTile(cellPos, null);
-        pelletsRemaining--;
-
-        // Add score
-        AddScore(10);
-
-        // 🔔 Notify listeners (ghost release, etc)
-        OnPelletEaten?.Invoke();
-
-        if (pelletsRemaining <= 0)
-            WinLevel();
+            if (pelletsRemaining <= 0)
+                WinLevel();
+        }
     }
 
     private void WinLevel()
