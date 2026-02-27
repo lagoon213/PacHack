@@ -1,0 +1,117 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|c:\\users\\jesse\\documents\\ict\\game design\\pachack\\assets\\scripts\\wallflasher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\wallflasher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\gameovermenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameovermenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\pacmanscripts\\pacmandeath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pacmanscripts\\pacmandeath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\pacmanscripts\\pacmanmovement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pacmanscripts\\pacmanmovement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\powerpelletblinktilemap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\powerpelletblinktilemap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Button.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs",
+              "RelativeDocumentMoniker": "Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs",
+              "RelativeToolTip": "Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T10:16:51.963Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GameOverMenu.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GameOverMenu.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameOverMenu.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GameOverMenu.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameOverMenu.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T10:15:21.387Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WallFlasher.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\WallFlasher.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\WallFlasher.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\WallFlasher.cs",
+              "RelativeToolTip": "Assets\\Scripts\\WallFlasher.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T09:58:09.184Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PacmanDeath.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
+              "ViewState": "AgIAADsAAAAAAAAAAAAYwGMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T09:15:02.796Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PacManMovement.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T08:51:39.646Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PowerPelletBlinkTilemap.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PowerPelletBlinkTilemap.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PowerPelletBlinkTilemap.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PowerPelletBlinkTilemap.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PowerPelletBlinkTilemap.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAADsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-23T08:44:28.389Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
