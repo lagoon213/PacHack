@@ -433,6 +433,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8efbdfd0761800a4fabd1ba487965961, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+--- !u!4 &319595440 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+  m_PrefabInstance: {fileID: 1251605041}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &505226754
 GameObject:
   m_ObjectHideFlags: 0
@@ -1471,6 +1476,63 @@ Tilemap:
   m_CorrespondingSourceObject: {fileID: 2957263423490838714, guid: 8731c70e8c06c824d9bec72fb118e3a6, type: 3}
   m_PrefabInstance: {fileID: 1442130110470661438}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1251605041
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2758780603407845618, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_Name
+      value: LeftWarpTile
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 9.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -15.61
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8381950290678615467, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 55ba2f8859a879e49bfcc1cdee032a97, type: 3}
 --- !u!4 &1283118868 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3180020834596844728, guid: e82f6a1b235cf63459a89020a5622c57, type: 3}
@@ -1731,6 +1793,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1503366573}
   m_CullTransparentMesh: 1
+--- !u!1001 &1507132631
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 36.48
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -15.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8410121825391769865, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+      propertyPath: m_Name
+      value: RightWarpTile
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
 --- !u!1 &1529574552
 GameObject:
   m_ObjectHideFlags: 0
@@ -1810,6 +1929,11 @@ CanvasRenderer:
 Tilemap:
   m_CorrespondingSourceObject: {fileID: 718696434237416585, guid: 8731c70e8c06c824d9bec72fb118e3a6, type: 3}
   m_PrefabInstance: {fileID: 1442130110470661438}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1573021591 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5796973205239784224, guid: 7337c415ef2ad4b4da71fb63344b1a84, type: 3}
+  m_PrefabInstance: {fileID: 1507132631}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1573946653
 GameObject:
@@ -2497,6 +2621,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1224470793}
     - target: {fileID: 135237136491108843, guid: 1e37eab69370bce40be08119f732b7d1, type: 3}
+      propertyPath: warpTileLeft
+      value: 
+      objectReference: {fileID: 319595440}
+    - target: {fileID: 135237136491108843, guid: 1e37eab69370bce40be08119f732b7d1, type: 3}
+      propertyPath: warpTileRight
+      value: 
+      objectReference: {fileID: 1573021591}
+    - target: {fileID: 135237136491108843, guid: 1e37eab69370bce40be08119f732b7d1, type: 3}
       propertyPath: modeController
       value: 
       objectReference: {fileID: 277723834}
@@ -2715,6 +2847,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1224470793}
     - target: {fileID: 7065725020253662189, guid: 5cc4dcdb03449ac468e6014468ce3f81, type: 3}
+      propertyPath: warpTileLeft
+      value: 
+      objectReference: {fileID: 319595440}
+    - target: {fileID: 7065725020253662189, guid: 5cc4dcdb03449ac468e6014468ce3f81, type: 3}
+      propertyPath: warpTileRight
+      value: 
+      objectReference: {fileID: 1573021591}
+    - target: {fileID: 7065725020253662189, guid: 5cc4dcdb03449ac468e6014468ce3f81, type: 3}
       propertyPath: modeController
       value: 
       objectReference: {fileID: 277723834}
@@ -2751,6 +2891,14 @@ PrefabInstance:
       propertyPath: Ghost_Room
       value: 
       objectReference: {fileID: 1224470793}
+    - target: {fileID: 2510546920279623957, guid: e82f6a1b235cf63459a89020a5622c57, type: 3}
+      propertyPath: warpTileLeft
+      value: 
+      objectReference: {fileID: 319595440}
+    - target: {fileID: 2510546920279623957, guid: e82f6a1b235cf63459a89020a5622c57, type: 3}
+      propertyPath: warpTileRight
+      value: 
+      objectReference: {fileID: 1573021591}
     - target: {fileID: 2510546920279623957, guid: e82f6a1b235cf63459a89020a5622c57, type: 3}
       propertyPath: modeController
       value: 
@@ -2974,6 +3122,14 @@ PrefabInstance:
       propertyPath: Ghost_Room
       value: 
       objectReference: {fileID: 1224470793}
+    - target: {fileID: 6942634338767650459, guid: 5d3eede68e466f7489a12b22cb6493c5, type: 3}
+      propertyPath: warpTileLeft
+      value: 
+      objectReference: {fileID: 319595440}
+    - target: {fileID: 6942634338767650459, guid: 5d3eede68e466f7489a12b22cb6493c5, type: 3}
+      propertyPath: warpTileRight
+      value: 
+      objectReference: {fileID: 1573021591}
     - target: {fileID: 8797610662333597174, guid: 5d3eede68e466f7489a12b22cb6493c5, type: 3}
       propertyPath: blink
       value: 
@@ -3120,6 +3276,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1224470793}
     - target: {fileID: 8428803223960239918, guid: e27b8aa2eaa15db45af2f729847d5928, type: 3}
+      propertyPath: warpTileLeft
+      value: 
+      objectReference: {fileID: 319595440}
+    - target: {fileID: 8428803223960239918, guid: e27b8aa2eaa15db45af2f729847d5928, type: 3}
+      propertyPath: warpTileRight
+      value: 
+      objectReference: {fileID: 1573021591}
+    - target: {fileID: 8428803223960239918, guid: e27b8aa2eaa15db45af2f729847d5928, type: 3}
       propertyPath: modeController
       value: 
       objectReference: {fileID: 277723834}
@@ -3144,3 +3308,5 @@ SceneRoots:
   - {fileID: 4709138552068000554}
   - {fileID: 214804566}
   - {fileID: 1157648841}
+  - {fileID: 1251605041}
+  - {fileID: 1507132631}
