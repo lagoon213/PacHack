@@ -11,6 +11,7 @@ using UnityEngine.Tilemaps;
 /// - 180° turn bij Scatter ↔ Chase switch
 /// - animatie params updaten
 /// - ghost house state (InHouse/CanExitHouse)
+/// - tunnel warp via 2 markers (GameObjects) op warp tile posities
 /// </summary>
 public class GhostMovement : MonoBehaviour
 {
@@ -44,7 +45,26 @@ public class GhostMovement : MonoBehaviour
     public Tilemap Ghost_Door;
 
     [Header("Special Speed Tilemaps")]
-    [SerializeField] private Tilemap Tunnel;
+    [SerializeField] private Tilemap Tunnel; // voor speed multiplier (mag hele tunnelstrook zijn)
+
+    /* =========================
+     * Warp markers (GameObjects)
+     * ========================= */
+
+    [Header("Warp Markers (GameObjects on tile centers)")]
+    [SerializeField] private Transform warpTileLeft;
+    [SerializeField] private Transform warpTileRight;
+
+    /* =========================
+     * Tunnel Warp
+     * ========================= */
+
+    [Header("Tunnel Warp Settings")]
+    [SerializeField] private float warpCooldown = 0.12f;
+
+    private Vector3Int leftWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
+    private Vector3Int rightWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
+    private float nextAllowedWarpTime;
 
     /* =========================
      * Snelheid-multipliers
@@ -76,14 +96,12 @@ public class GhostMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        // Luister naar mode-wissels (180° turn)
         if (modeController != null)
             modeController.OnModeChanged += HandleModeChanged;
     }
 
     private void OnDisable()
     {
-        // Unsubscribe (geen leaks)
         if (modeController != null)
             modeController.OnModeChanged -= HandleModeChanged;
     }
@@ -105,6 +123,8 @@ public class GhostMovement : MonoBehaviour
         var cell = Walls.WorldToCell(transform.position);
         TargetWorldPos = Walls.GetCellCenterWorld(cell);
         transform.position = TargetWorldPos;
+
+        CacheWarpCellsFromMarkers();
     }
 
     private void Update()
@@ -113,19 +133,21 @@ public class GhostMovement : MonoBehaviour
          * Tile-logica (richting kiezen)
          * ========================= */
 
-        // Alleen kiezen als we tile-center bereikt hebben
         if (Vector3.Distance(transform.position, TargetWorldPos) < 0.001f)
         {
             transform.position = TargetWorldPos;
+
+            // ✅ Warp toepassen op tile-center moment
+            // Als we warpen: frame stoppen zodat target berekening schoon opnieuw gebeurt.
+            if (ApplyWarpIfOnWarpTile())
+                return;
 
             // Check of ghost de ghost house heeft verlaten
             var cell = Walls.WorldToCell(transform.position);
             if (InHouse && Ghost_Room != null && !Ghost_Room.HasTile(cell))
             {
                 InHouse = false;
-
-                // Buiten: nooit terug door de deur
-                CanExitHouse = false;
+                CanExitHouse = false; // Buiten: nooit terug door de deur
             }
 
             // Brain kiest gewenste richting
@@ -183,9 +205,6 @@ public class GhostMovement : MonoBehaviour
      * Mode-wissel handling
      * ========================= */
 
-    /// <summary>
-    /// 180° turn bij Scatter ↔ Chase (classic gedrag).
-    /// </summary>
     private void HandleModeChanged(GhostMode oldMode, GhostMode newMode)
     {
         bool scatterChaseSwitch =
@@ -195,12 +214,8 @@ public class GhostMovement : MonoBehaviour
         if (!scatterChaseSwitch) return;
         if (CurrentDir == Vector2Int.zero) return;
 
-        Vector2Int reversed = -CurrentDir;
+        SetDir(-CurrentDir);
 
-        // In classic Pac-Man: always reverse (ook als het "terug" is)
-        SetDir(reversed);
-
-        // Gebruik de tile waar je NAARTOE ging als basis (stabieler dan transform)
         var currentCell = Walls.WorldToCell(TargetWorldPos);
         var nextCell = currentCell + new Vector3Int(CurrentDir.x, CurrentDir.y, 0);
         TargetWorldPos = Walls.GetCellCenterWorld(nextCell);
@@ -210,16 +225,56 @@ public class GhostMovement : MonoBehaviour
      * Helpers
      * ========================= */
 
-    /// <summary>
-    /// Zet de huidige richting.
-    /// </summary>
-    private void SetDir(Vector2Int dir)
+    private void SetDir(Vector2Int dir) => CurrentDir = dir;
+
+    /* =========================
+     * Warp helpers
+     * ========================= */
+
+    private void CacheWarpCellsFromMarkers()
     {
-        CurrentDir = dir;
+        if (warpTileLeft == null || warpTileRight == null)
+        {
+            Debug.LogWarning($"{name}: Warp markers missen. Sleep warpTileLeft en warpTileRight in de inspector.");
+            return;
+        }
+
+        leftWarpCell = Walls.WorldToCell(warpTileLeft.position);
+        rightWarpCell = Walls.WorldToCell(warpTileRight.position);
+
+        if (leftWarpCell == rightWarpCell)
+        {
+            Debug.LogError($"{name}: Left/Right warp markers zitten op dezelfde cell: {leftWarpCell}. Zet ze op verschillende tiles.");
+        }
     }
 
     /// <summary>
-    /// Check of de ghost die kant op kan (walls/door/room regels).
+    /// Als de ghost op een warp tile staat (tile-center moment), teleport naar de andere warp tile.
+    /// </summary>
+    private bool ApplyWarpIfOnWarpTile()
+    {
+        if (Time.time < nextAllowedWarpTime) return false;
+        if (leftWarpCell.x == int.MinValue || rightWarpCell.x == int.MinValue) return false;
+
+        var cell = Walls.WorldToCell(transform.position);
+
+        if (cell == leftWarpCell)
+            cell = rightWarpCell;
+        else if (cell == rightWarpCell)
+            cell = leftWarpCell;
+        else
+            return false;
+
+        nextAllowedWarpTime = Time.time + warpCooldown;
+
+        TargetWorldPos = Walls.GetCellCenterWorld(cell);
+        transform.position = TargetWorldPos;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Check of de ghost die kant op kan (walls/door/room regels + warp exit).
     /// </summary>
     public bool CanMove(Vector2Int dir)
     {
@@ -227,6 +282,14 @@ public class GhostMovement : MonoBehaviour
         if (Walls == null) return false;
 
         var currentCell = Walls.WorldToCell(transform.position);
+
+        // ✅ Warp-exit toestaan (classic)
+        if (leftWarpCell.x != int.MinValue && currentCell == leftWarpCell && dir == Vector2Int.left)
+            return true;
+
+        if (rightWarpCell.x != int.MinValue && currentCell == rightWarpCell && dir == Vector2Int.right)
+            return true;
+
         var nextCell = currentCell + new Vector3Int(dir.x, dir.y, 0);
 
         // Walls blokkeren altijd
@@ -239,22 +302,15 @@ public class GhostMovement : MonoBehaviour
         // Ghost door:
         if (Ghost_Door != null && Ghost_Door.HasTile(nextCell))
         {
-            // In house: alleen door als release actief is
-            if (InHouse && !CanExitHouse) return false;
-
-            // Buiten: nooit terug door de deur
-            if (!InHouse) return false;
+            if (InHouse && !CanExitHouse) return false; // In house: alleen door als release actief is
+            if (!InHouse) return false;                 // Buiten: nooit terug door de deur
         }
 
         return true;
     }
 
     /// <summary>
-    /// Bepaalt multiplier op basis van tile + mode:
-    /// - in ghost house
-    /// - tunnel
-    /// - frightened
-    /// - default
+    /// Bepaalt multiplier op basis van tile + mode.
     /// </summary>
     private float GetSpeedMultiplier()
     {
@@ -262,19 +318,15 @@ public class GhostMovement : MonoBehaviour
 
         Vector3Int cell = Walls.WorldToCell(transform.position);
 
-        // In ghost house (alleen room, niet deur)
         if (Ghost_Room != null && Ghost_Room.HasTile(cell))
             return houseMultiplier;
 
-        // Tunnel
         if (Tunnel != null && Tunnel.HasTile(cell))
             return tunnelMultiplier;
 
-        // Frightened
         if (modeController != null && modeController.CurrentMode == GhostMode.Frightened)
             return frightenedMultiplier;
 
-        // Default
         return normalMultiplier;
     }
 }

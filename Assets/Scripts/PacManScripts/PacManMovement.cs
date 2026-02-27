@@ -10,13 +10,14 @@ using UnityEngine.InputSystem;
 /// - botsing met walls/ghost house
 /// - pellets opeten
 /// - visual draaien + animatie pauzeren
+/// - tunnel warp via 2 markers (GameObjects) op warp tile posities
 ///
 /// Pac-Man speed is de basis voor ghost speed.
 /// </summary>
 public class PacManMovement : MonoBehaviour
 {
-
     public static event System.Action OnPelletEaten;
+
     /* =========================
      * Referenties
      * ========================= */
@@ -34,6 +35,14 @@ public class PacManMovement : MonoBehaviour
     public Tilemap Pellets;
 
     /* =========================
+     * Warp markers (GameObjects)
+     * ========================= */
+
+    [Header("Warp Markers (GameObjects on tile centers)")]
+    [SerializeField] private Transform warpTileLeft;
+    [SerializeField] private Transform warpTileRight;
+
+    /* =========================
      * Movement settings
      * ========================= */
 
@@ -45,27 +54,24 @@ public class PacManMovement : MonoBehaviour
     public float MoveSpeed => moveSpeed;
 
     /* =========================
+     * Warp settings
+     * ========================= */
+
+    [Header("Tunnel Warp Settings")]
+    [SerializeField] private float warpCooldown = 0.12f;
+
+    // Deze cells zijn in WALLS cell-space
+    private Vector3Int leftWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
+    private Vector3Int rightWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
+    private float nextAllowedWarpTime;
+
+    /* =========================
      * Movement state
      * ========================= */
 
-    /// <summary>
-    /// Huidige richting (tile coords).
-    /// </summary>
     private Vector2Int _currentDir = Vector2Int.right;
-
-    /// <summary>
-    /// Richting die de speler probeert te pakken.
-    /// </summary>
     private Vector2Int _desiredDir = Vector2Int.right;
-
-    /// <summary>
-    /// Raw input vector (Input System).
-    /// </summary>
     private Vector2 _moveInput;
-
-    /// <summary>
-    /// Volgende world target (center van volgende tile).
-    /// </summary>
     private Vector3 _targetWorldPos;
 
     /* =========================
@@ -74,24 +80,34 @@ public class PacManMovement : MonoBehaviour
 
     private void Start()
     {
+        if (Walls == null)
+        {
+            Debug.LogError($"{name}: Walls tilemap ontbreekt!");
+            enabled = false;
+            return;
+        }
+
         // Start in het midden van de tile
         var cell = Walls.WorldToCell(transform.position);
         _targetWorldPos = Walls.GetCellCenterWorld(cell);
         transform.position = _targetWorldPos;
+
+        CacheWarpCellsFromMarkers();
     }
 
     private void Update()
     {
         ReadInput();
 
-        /* =========================
-         * Tile-logica
-         * ========================= */
-
         // Alleen wisselen als we tile-center bereikt hebben
         if (Vector3.Distance(transform.position, _targetWorldPos) < 0.001f)
         {
             transform.position = _targetWorldPos;
+
+            // ✅ Warp toepassen op tile-center moment
+            // Als we warpen: frame stoppen zodat target berekening schoon opnieuw gebeurt.
+            if (ApplyWarpIfOnWarpTile())
+                return;
 
             // Probeer gewenste richting toe te passen
             if (CanMove(_desiredDir))
@@ -109,54 +125,42 @@ public class PacManMovement : MonoBehaviour
                 _targetWorldPos = Walls.GetCellCenterWorld(nextCell);
             }
 
-            /* =========================
-             * Pellets opeten
-             * ========================= */
-
-            var pelletCell = Pellets.WorldToCell(transform.position);
-            if (Pellets.HasTile(pelletCell))
+            // Pellets opeten
+            if (Pellets != null)
             {
-                Pellets.SetTile(pelletCell, null);
-                OnPelletEaten?.Invoke();
+                var pelletCell = Pellets.WorldToCell(transform.position);
+                if (Pellets.HasTile(pelletCell))
+                {
+                    Pellets.SetTile(pelletCell, null);
+                    OnPelletEaten?.Invoke();
+                }
             }
         }
 
-        /* =========================
-         * Beweging uitvoeren
-         * ========================= */
-
+        // Beweging uitvoeren
         transform.position = Vector3.MoveTowards(
             transform.position,
             _targetWorldPos,
             moveSpeed * Time.deltaTime
         );
 
-        /* =========================
-         * Visual + animatie
-         * ========================= */
-
+        // Visual + animatie
         UpdateFacing();
 
-        // Animatie pauze als je stilstaat
         bool isMoving = _currentDir != Vector2Int.zero;
-        animator.speed = isMoving ? 1f : 0f;
+        if (animator != null)
+            animator.speed = isMoving ? 1f : 0f;
     }
 
     /* =========================
      * Input
      * ========================= */
 
-    /// <summary>
-    /// Input System callback.
-    /// </summary>
     public void OnMove(InputValue value)
     {
         _moveInput = value.Get<Vector2>();
     }
 
-    /// <summary>
-    /// Input → grid richting (geen diagonalen).
-    /// </summary>
     private void ReadInput()
     {
         int x = Mathf.RoundToInt(_moveInput.x);
@@ -170,32 +174,89 @@ public class PacManMovement : MonoBehaviour
     }
 
     /* =========================
-     * Helpers
+     * Warp helpers
      * ========================= */
 
-    /// <summary>
-    /// Check of Pac-Man die kant op mag (walls/door/room blokkeren).
-    /// </summary>
+    private void CacheWarpCellsFromMarkers()
+    {
+        if (warpTileLeft == null || warpTileRight == null)
+        {
+            Debug.LogWarning($"{name}: Warp markers missen. Sleep warpTileLeft en warpTileRight in de inspector.");
+            return;
+        }
+
+        // We nemen de marker worldpos en zetten die om naar Walls cell-space
+        leftWarpCell = Walls.WorldToCell(warpTileLeft.position);
+        rightWarpCell = Walls.WorldToCell(warpTileRight.position);
+
+        // Extra veilig: snap markers naar cell centers (optioneel)
+        // warpTileLeft.position = Walls.GetCellCenterWorld(leftWarpCell);
+        // warpTileRight.position = Walls.GetCellCenterWorld(rightWarpCell);
+
+        if (leftWarpCell == rightWarpCell)
+        {
+            Debug.LogError($"{name}: Left/Right warp markers zitten op dezelfde cell: {leftWarpCell}. Zet ze op verschillende tiles.");
+        }
+        else
+        {
+            Debug.Log($"{name}: WarpCells (Walls) Left={leftWarpCell}, Right={rightWarpCell}");
+        }
+    }
+
+    private bool ApplyWarpIfOnWarpTile()
+    {
+        if (Time.time < nextAllowedWarpTime) return false;
+        if (leftWarpCell.x == int.MinValue || rightWarpCell.x == int.MinValue) return false;
+
+        var cell = Walls.WorldToCell(transform.position);
+
+        if (cell == leftWarpCell)
+            cell = rightWarpCell;
+        else if (cell == rightWarpCell)
+            cell = leftWarpCell;
+        else
+            return false;
+
+        nextAllowedWarpTime = Time.time + warpCooldown;
+
+        _targetWorldPos = Walls.GetCellCenterWorld(cell);
+        transform.position = _targetWorldPos;
+
+        return true;
+    }
+
+    /* =========================
+     * Movement helpers
+     * ========================= */
+
     private bool CanMove(Vector2Int dir)
     {
         if (dir == Vector2Int.zero) return false;
+        if (Walls == null) return false;
 
         var currentCell = Walls.WorldToCell(transform.position);
+
+        // ✅ Warp-exit toestaan (classic)
+        if (leftWarpCell.x != int.MinValue && currentCell == leftWarpCell && dir == Vector2Int.left)
+            return true;
+
+        if (rightWarpCell.x != int.MinValue && currentCell == rightWarpCell && dir == Vector2Int.right)
+            return true;
+
         var nextCell = currentCell + new Vector3Int(dir.x, dir.y, 0);
 
-        if (Walls.HasTile(nextCell) ||
-            Ghost_Door.HasTile(nextCell) ||
-            Ghost_Room.HasTile(nextCell))
+        if ((Walls != null && Walls.HasTile(nextCell)) ||
+            (Ghost_Door != null && Ghost_Door.HasTile(nextCell)) ||
+            (Ghost_Room != null && Ghost_Room.HasTile(nextCell)))
             return false;
 
         return true;
     }
 
-    /// <summary>
-    /// Draai de visual naar de huidige richting.
-    /// </summary>
     private void UpdateFacing()
     {
+        if (visual == null) return;
+
         if (_currentDir == Vector2Int.right)
             visual.rotation = Quaternion.Euler(0, 0, 0);
         else if (_currentDir == Vector2Int.up)
@@ -206,8 +267,5 @@ public class PacManMovement : MonoBehaviour
             visual.rotation = Quaternion.Euler(0, 0, -90);
     }
 
-    /// <summary>
-    /// Huidige richting (voor ghost AI zoals Pinky).
-    /// </summary>
     public Vector2Int CurrentDir => _currentDir;
 }
