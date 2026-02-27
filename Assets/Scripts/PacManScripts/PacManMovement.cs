@@ -15,6 +15,8 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PacManMovement : MonoBehaviour
 {
+
+    public static event System.Action OnPelletEaten;
     /* =========================
      * Referenties
      * ========================= */

@@ -10,6 +10,7 @@ using UnityEngine.Tilemaps;
 /// - snelheid (multipliers)
 /// - 180° turn bij Scatter ↔ Chase switch
 /// - animatie params updaten
+/// - ghost house state (InHouse/CanExitHouse)
 /// </summary>
 public class GhostMovement : MonoBehaviour
 {
@@ -21,6 +22,17 @@ public class GhostMovement : MonoBehaviour
     [SerializeField] private PacManMovement pacman;
     [SerializeField] private GhostBrain brain;
     [SerializeField] private GhostModeController modeController;
+
+    /* =========================
+     * Ghost house state (per ghost instelbaar)
+     * ========================= */
+
+    [Header("Ghost House State")]
+    [SerializeField] private bool startInHouse = true;          // Blinky = false
+    [SerializeField] private bool startCanExitHouse = false;    // meestal false
+
+    public bool InHouse { get; private set; }
+    public bool CanExitHouse { get; set; }
 
     /* =========================
      * Tilemaps
@@ -41,7 +53,7 @@ public class GhostMovement : MonoBehaviour
     [Header("Speed Multipliers")]
     [SerializeField] private float normalMultiplier = 0.75f;     // Scatter/Chase
     [SerializeField] private float frightenedMultiplier = 0.5f;  // Frightened
-    [SerializeField] private float houseMultiplier = 0.45f;      // Ghost house/door
+    [SerializeField] private float houseMultiplier = 0.45f;      // In ghost house
     [SerializeField] private float tunnelMultiplier = 0.4f;      // Tunnel
 
     /* =========================
@@ -78,6 +90,17 @@ public class GhostMovement : MonoBehaviour
 
     private void Start()
     {
+        if (Walls == null)
+        {
+            Debug.LogError($"{name}: Walls tilemap ontbreekt!");
+            enabled = false;
+            return;
+        }
+
+        // Init house state (per ghost via Inspector)
+        InHouse = startInHouse;
+        CanExitHouse = startCanExitHouse;
+
         // Start netjes in het midden van de tile
         var cell = Walls.WorldToCell(transform.position);
         TargetWorldPos = Walls.GetCellCenterWorld(cell);
@@ -95,8 +118,18 @@ public class GhostMovement : MonoBehaviour
         {
             transform.position = TargetWorldPos;
 
+            // Check of ghost de ghost house heeft verlaten
+            var cell = Walls.WorldToCell(transform.position);
+            if (InHouse && Ghost_Room != null && !Ghost_Room.HasTile(cell))
+            {
+                InHouse = false;
+
+                // Buiten: nooit terug door de deur
+                CanExitHouse = false;
+            }
+
             // Brain kiest gewenste richting
-            Vector2Int desiredDir = brain.GetDesiredDir(this);
+            Vector2Int desiredDir = brain != null ? brain.GetDesiredDir(this) : Vector2Int.zero;
 
             if (CanMove(desiredDir))
                 SetDir(desiredDir);
@@ -118,28 +151,32 @@ public class GhostMovement : MonoBehaviour
          * Beweging uitvoeren
          * ========================= */
 
-        // Snelheid = Pac-Man speed * multiplier
-        float speed = pacman.MoveSpeed * GetSpeedMultiplier();
+        if (pacman != null)
+        {
+            float speed = pacman.MoveSpeed * GetSpeedMultiplier();
 
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            TargetWorldPos,
-            speed * Time.deltaTime
-        );
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                TargetWorldPos,
+                speed * Time.deltaTime
+            );
+        }
 
         /* =========================
          * Animatie updaten
          * ========================= */
 
-        animator.SetFloat("MoveX", CurrentDir.x);
-        animator.SetFloat("MoveY", CurrentDir.y);
+        if (animator != null)
+        {
+            animator.SetFloat("MoveX", CurrentDir.x);
+            animator.SetFloat("MoveY", CurrentDir.y);
 
-        // Frightened animatie aan/uit
-        animator.SetBool(
-            "IsFrightened",
-            modeController != null &&
-            modeController.CurrentMode == GhostMode.Frightened
-        );
+            animator.SetBool(
+                "IsFrightened",
+                modeController != null &&
+                modeController.CurrentMode == GhostMode.Frightened
+            );
+        }
     }
 
     /* =========================
@@ -160,16 +197,13 @@ public class GhostMovement : MonoBehaviour
 
         Vector2Int reversed = -CurrentDir;
 
-        // Alleen omkeren als het kan (geen wall-jitter)
-        if (CanMove(reversed))
-        {
-            SetDir(reversed);
+        // In classic Pac-Man: always reverse (ook als het "terug" is)
+        SetDir(reversed);
 
-            // Direct nieuwe target zodat reactie instant is
-            var currentCell = Walls.WorldToCell(transform.position);
-            var nextCell = currentCell + new Vector3Int(CurrentDir.x, CurrentDir.y, 0);
-            TargetWorldPos = Walls.GetCellCenterWorld(nextCell);
-        }
+        // Gebruik de tile waar je NAARTOE ging als basis (stabieler dan transform)
+        var currentCell = Walls.WorldToCell(TargetWorldPos);
+        var nextCell = currentCell + new Vector3Int(CurrentDir.x, CurrentDir.y, 0);
+        TargetWorldPos = Walls.GetCellCenterWorld(nextCell);
     }
 
     /* =========================
@@ -185,38 +219,51 @@ public class GhostMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Check of de ghost die kant op kan (geen muur/door/room).
+    /// Check of de ghost die kant op kan (walls/door/room regels).
     /// </summary>
     public bool CanMove(Vector2Int dir)
     {
         if (dir == Vector2Int.zero) return false;
+        if (Walls == null) return false;
 
         var currentCell = Walls.WorldToCell(transform.position);
         var nextCell = currentCell + new Vector3Int(dir.x, dir.y, 0);
 
-        // Block: walls + ghost door + ghost room
-        if (Walls.HasTile(nextCell) ||
-            (Ghost_Door != null && Ghost_Door.HasTile(nextCell)) ||
-            (Ghost_Room != null && Ghost_Room.HasTile(nextCell)))
+        // Walls blokkeren altijd
+        if (Walls.HasTile(nextCell)) return false;
+
+        // Ghost room: alleen blokkeren als je buiten bent
+        if (!InHouse && Ghost_Room != null && Ghost_Room.HasTile(nextCell))
             return false;
+
+        // Ghost door:
+        if (Ghost_Door != null && Ghost_Door.HasTile(nextCell))
+        {
+            // In house: alleen door als release actief is
+            if (InHouse && !CanExitHouse) return false;
+
+            // Buiten: nooit terug door de deur
+            if (!InHouse) return false;
+        }
 
         return true;
     }
 
     /// <summary>
     /// Bepaalt multiplier op basis van tile + mode:
-    /// - house/door
+    /// - in ghost house
     /// - tunnel
     /// - frightened
     /// - default
     /// </summary>
     private float GetSpeedMultiplier()
     {
+        if (Walls == null) return normalMultiplier;
+
         Vector3Int cell = Walls.WorldToCell(transform.position);
 
-        // House/door
-        if ((Ghost_Room != null && Ghost_Room.HasTile(cell)) ||
-            (Ghost_Door != null && Ghost_Door.HasTile(cell)))
+        // In ghost house (alleen room, niet deur)
+        if (Ghost_Room != null && Ghost_Room.HasTile(cell))
             return houseMultiplier;
 
         // Tunnel
@@ -224,8 +271,7 @@ public class GhostMovement : MonoBehaviour
             return tunnelMultiplier;
 
         // Frightened
-        if (modeController != null &&
-            modeController.CurrentMode == GhostMode.Frightened)
+        if (modeController != null && modeController.CurrentMode == GhostMode.Frightened)
             return frightenedMultiplier;
 
         // Default
