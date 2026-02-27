@@ -1,41 +1,79 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
+
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
 
     public int score;
-    public int highScore; // track the high score
+    public int highScore;
+
     public Tilemap pelletTilemap;
     public int pelletsRemaining;
-    void Start()
-    {
-        CountPellets();
-    }
-    void Awake()
+
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // make highscore persist across scenes
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
 
-        // Load high score from previous sessions
         highScore = PlayerPrefs.GetInt("HighScore", 0);
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void Start()
+    {
+        // eerste scene
+        RefreshPelletTilemapAndCount();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // na restart / scene reload
+        RefreshPelletTilemapAndCount();
+    }
+
+    private void RefreshPelletTilemapAndCount()
+    {
+        // Zoek opnieuw de pellet tilemap als die missing is
+        if (pelletTilemap == null)
+        {
+            var go = GameObject.Find("Pellets"); // zet dit gelijk aan jouw GameObject naam
+            if (go != null)
+                pelletTilemap = go.GetComponent<Tilemap>();
+        }
+
+        if (pelletTilemap != null)
+            CountPellets();
+        else
+            Debug.LogWarning("ScoreManager: pelletTilemap niet gevonden. Check GameObject naam ('Pellets').");
     }
 
     public void AddScore(int amount)
     {
         score += amount;
-        // Update high score if broken
+
         if (score > highScore)
         {
             highScore = score;
-            PlayerPrefs.SetInt("HighScore", highScore); // save it
+            PlayerPrefs.SetInt("HighScore", highScore);
         }
     }
 
@@ -44,7 +82,7 @@ public class ScoreManager : MonoBehaviour
         score = 0;
     }
 
-    void CountPellets()
+    private void CountPellets()
     {
         pelletsRemaining = 0;
 
@@ -53,9 +91,7 @@ public class ScoreManager : MonoBehaviour
         foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
             if (pelletTilemap.HasTile(pos))
-            {
                 pelletsRemaining++;
-            }
         }
 
         Debug.Log("Pellets found: " + pelletsRemaining);
@@ -63,23 +99,22 @@ public class ScoreManager : MonoBehaviour
 
     public void PelletEaten(Vector3 worldPosition)
     {
+        if (pelletTilemap == null) return;
+
         Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
 
         if (pelletTilemap.HasTile(cellPos))
         {
-            pelletTilemap.SetTile(cellPos, null); // remove tile
+            pelletTilemap.SetTile(cellPos, null);
             pelletsRemaining--;
 
             if (pelletsRemaining <= 0)
-            {
                 WinLevel();
-            }
         }
     }
 
-    void WinLevel()
+    private void WinLevel()
     {
         Debug.Log("YOU WIN");
     }
-    
 }
