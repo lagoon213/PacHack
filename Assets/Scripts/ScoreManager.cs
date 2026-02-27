@@ -1,41 +1,49 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
 
+    // Global pellet event (ghosts listen to this)
+    public static event System.Action OnPelletEaten;
+
     public int score;
-    public int highScore; // track the high score
+    public int highScore;
+
+    [Header("Pellet Tilemap")]
     public Tilemap pelletTilemap;
     public int pelletsRemaining;
-    void Start()
-    {
-        CountPellets();
-    }
-    void Awake()
+
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // make highscore persist across scenes
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
 
-        // Load high score from previous sessions
         highScore = PlayerPrefs.GetInt("HighScore", 0);
+    }
+
+    private void Start()
+    {
+        CountPellets();
     }
 
     public void AddScore(int amount)
     {
         score += amount;
-        // Update high score if broken
+
         if (score > highScore)
         {
             highScore = score;
-            PlayerPrefs.SetInt("HighScore", highScore); // save it
+            PlayerPrefs.SetInt("HighScore", highScore);
         }
     }
 
@@ -44,7 +52,7 @@ public class ScoreManager : MonoBehaviour
         score = 0;
     }
 
-    void CountPellets()
+    private void CountPellets()
     {
         pelletsRemaining = 0;
 
@@ -53,33 +61,36 @@ public class ScoreManager : MonoBehaviour
         foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
             if (pelletTilemap.HasTile(pos))
-            {
                 pelletsRemaining++;
-            }
         }
 
         Debug.Log("Pellets found: " + pelletsRemaining);
     }
 
+    // 🟡 SINGLE SOURCE OF TRUTH
     public void PelletEaten(Vector3 worldPosition)
-{
-    Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
+    {
+        Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
 
-    if (!pelletTilemap.HasTile(cellPos))
-        return; // safety guard
+        if (!pelletTilemap.HasTile(cellPos))
+            return;
 
-    pelletTilemap.SetTile(cellPos, null);
-    pelletsRemaining--;
+        // Remove pellet
+        pelletTilemap.SetTile(cellPos, null);
+        pelletsRemaining--;
 
-    AddScore(10); // SCORE GOES HERE
+        // Add score
+        AddScore(10);
 
-    if (pelletsRemaining <= 0)
-        WinLevel();
-}
+        // 🔔 Notify listeners (ghost release, etc)
+        OnPelletEaten?.Invoke();
 
-    void WinLevel()
+        if (pelletsRemaining <= 0)
+            WinLevel();
+    }
+
+    private void WinLevel()
     {
         Debug.Log("YOU WIN");
     }
-    
 }
