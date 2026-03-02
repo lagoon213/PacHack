@@ -12,19 +12,19 @@ public class GhostHouseReleaseController : MonoBehaviour
         public bool released;
     }
 
-    [Header("Release rules (pellets gegeten)")]
+    [Header("Release rules (pellets eaten)")]
     [SerializeField] private ReleaseRule[] rules;
 
     private int pelletsEaten;
 
     private void OnEnable()
     {
-        PacManMovement.OnPelletEaten += HandlePellet;
+        ScoreManager.OnPelletEaten += HandlePellet;
     }
 
     private void OnDisable()
     {
-        PacManMovement.OnPelletEaten -= HandlePellet;
+        ScoreManager.OnPelletEaten -= HandlePellet;
     }
 
     private void HandlePellet()
