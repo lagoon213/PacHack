@@ -6,9 +6,7 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
 
-    // Global pellet event (ghosts listen to this)
-    public static event System.Action OnPelletEaten;
-
+ public static event System.Action OnPelletEaten;
     public int score;
     public int highScore;
 
@@ -103,18 +101,23 @@ public class ScoreManager : MonoBehaviour
     // 🟡 SINGLE SOURCE OF TRUTH
     public void PelletEaten(Vector3 worldPosition)
     {
-        if (pelletTilemap == null) return;
-
         Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
 
-        if (pelletTilemap.HasTile(cellPos))
-        {
-            pelletTilemap.SetTile(cellPos, null);
-            pelletsRemaining--;
+        if (!pelletTilemap.HasTile(cellPos))
+            return;
 
-            if (pelletsRemaining <= 0)
-                WinLevel();
-        }
+        // Remove pellet
+        pelletTilemap.SetTile(cellPos, null);
+        pelletsRemaining--;
+
+        // Add score
+        AddScore(10);
+
+        // 🔔 Notify listeners (ghost release, etc)
+        OnPelletEaten?.Invoke();
+
+        if (pelletsRemaining <= 0)
+            WinLevel();
     }
 
     private void WinLevel()

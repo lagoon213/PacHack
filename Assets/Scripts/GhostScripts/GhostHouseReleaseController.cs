@@ -19,7 +19,6 @@ public class GhostHouseReleaseController : MonoBehaviour
 
     private void OnEnable()
     {
-        // Listen to ScoreManager now (not PacManMovement)
         ScoreManager.OnPelletEaten += HandlePellet;
     }
 
