@@ -1,43 +1,21 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-/// <summary>
-/// Ghost movement (tile-based).
-///
-/// Doet:
-/// - bewegen van tile naar tile
-/// - richting kiezen via GhostBrain
-/// - snelheid (multipliers)
-/// - 180° turn bij Scatter ↔ Chase switch
-/// - animatie params updaten
-/// - ghost house state (InHouse/CanExitHouse)
-/// - tunnel warp via 2 markers (GameObjects) op warp tile posities
-/// </summary>
 public class GhostMovement : MonoBehaviour
 {
-    /* =========================
-     * Referenties
-     * ========================= */
-
     [SerializeField] private Animator animator;
     [SerializeField] private PacManMovement pacman;
     [SerializeField] private GhostBrain brain;
     [SerializeField] private GhostModeController modeController;
-
-    /* =========================
-     * Ghost house state (per ghost instelbaar)
-     * ========================= */
+    [SerializeField] private GhostEyes eyes;
 
     [Header("Ghost House State")]
-    [SerializeField] private bool startInHouse = true;          // Blinky = false
-    [SerializeField] private bool startCanExitHouse = false;    // meestal false
+    [SerializeField] private bool startInHouse = true;
+    [SerializeField] private bool startCanExitHouse = false;
 
     public bool InHouse { get; private set; }
     public bool CanExitHouse { get; set; }
-
-    /* =========================
-     * Tilemaps
-     * ========================= */
 
     [Header("Collision Tilemaps")]
     public Tilemap Walls;
@@ -45,19 +23,11 @@ public class GhostMovement : MonoBehaviour
     public Tilemap Ghost_Door;
 
     [Header("Special Speed Tilemaps")]
-    [SerializeField] private Tilemap Tunnel; // voor speed multiplier (mag hele tunnelstrook zijn)
-
-    /* =========================
-     * Warp markers (GameObjects)
-     * ========================= */
+    [SerializeField] private Tilemap Tunnel;
 
     [Header("Warp Markers (GameObjects on tile centers)")]
     [SerializeField] private Transform warpTileLeft;
     [SerializeField] private Transform warpTileRight;
-
-    /* =========================
-     * Tunnel Warp
-     * ========================= */
 
     [Header("Tunnel Warp Settings")]
     [SerializeField] private float warpCooldown = 0.12f;
@@ -66,33 +36,32 @@ public class GhostMovement : MonoBehaviour
     private Vector3Int rightWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
     private float nextAllowedWarpTime;
 
-    /* =========================
-     * Snelheid-multipliers
-     * ========================= */
-
     [Header("Speed Multipliers")]
-    [SerializeField] private float normalMultiplier = 0.75f;     // Scatter/Chase
-    [SerializeField] private float frightenedMultiplier = 0.5f;  // Frightened
-    [SerializeField] private float houseMultiplier = 0.45f;      // In ghost house
-    [SerializeField] private float tunnelMultiplier = 0.4f;      // Tunnel
+    [SerializeField] private float normalMultiplier = 0.75f;
+    [SerializeField] private float frightenedMultiplier = 0.5f;
+    [SerializeField] private float houseMultiplier = 0.45f;
+    [SerializeField] private float tunnelMultiplier = 0.4f;
 
-    /* =========================
-     * Runtime state
-     * ========================= */
+    [Header("Eyes Mode")]
+    [SerializeField] private float eyesMultiplier = 1.8f;
 
-    /// <summary>
-    /// Huidige richting (tile coords).
-    /// </summary>
+    [Tooltip("Tile-center net buiten de ghost door (buiten de box).")]
+    [SerializeField] private Transform eyesDoorTarget;
+
+    [Tooltip("Tile-center binnen in de ghost house (home).")]
+    [SerializeField] private Transform eyesHomeTarget;
+
+    [Tooltip("Hoelang in house blijven na terugkomen.")]
+    [SerializeField] private float respawnHoldInHouseSeconds = 1.0f;
+
+    public bool IsEyes { get; private set; }
+    private bool holdInHouseActive;
+
     public Vector2Int CurrentDir { get; private set; } = Vector2Int.right;
-
-    /// <summary>
-    /// Volgende world positie (center van volgende tile).
-    /// </summary>
     public Vector3 TargetWorldPos { get; private set; }
 
-    /* =========================
-     * Unity lifecycle
-     * ========================= */
+    // ✅ onthoud waar hij dood ging (tile cell)
+    private Vector3Int deathCell = new Vector3Int(int.MinValue, int.MinValue, 0);
 
     private void OnEnable()
     {
@@ -115,52 +84,63 @@ public class GhostMovement : MonoBehaviour
             return;
         }
 
-        // Init house state (per ghost via Inspector)
+        if (eyes == null)
+            eyes = GetComponent<GhostEyes>();
+
         InHouse = startInHouse;
         CanExitHouse = startCanExitHouse;
 
-        // Start netjes in het midden van de tile
-        var cell = Walls.WorldToCell(transform.position);
-        TargetWorldPos = Walls.GetCellCenterWorld(cell);
-        transform.position = TargetWorldPos;
+        SnapToCellCenter();
 
         CacheWarpCellsFromMarkers();
+
+        if (eyes != null)
+            eyes.ShowBody();
     }
 
     private void Update()
     {
-        /* =========================
-         * Tile-logica (richting kiezen)
-         * ========================= */
-
         if (Vector3.Distance(transform.position, TargetWorldPos) < 0.001f)
         {
             transform.position = TargetWorldPos;
 
-            // ✅ Warp toepassen op tile-center moment
-            // Als we warpen: frame stoppen zodat target berekening schoon opnieuw gebeurt.
-            if (ApplyWarpIfOnWarpTile())
-                return;
-
-            // Check of ghost de ghost house heeft verlaten
-            var cell = Walls.WorldToCell(transform.position);
-            if (InHouse && Ghost_Room != null && !Ghost_Room.HasTile(cell))
+            // ✅ HARD: eyes warpen NOOIT
+            if (!IsEyes)
             {
-                InHouse = false;
-                CanExitHouse = false; // Buiten: nooit terug door de deur
+                if (ApplyWarpIfOnWarpTile())
+                    return;
             }
 
-            // Brain kiest gewenste richting
-            Vector2Int desiredDir = brain != null ? brain.GetDesiredDir(this) : Vector2Int.zero;
+            var cell = Walls.WorldToCell(transform.position);
+
+            // ✅ Eyes terug? check home cell
+            if (IsEyes && eyesHomeTarget != null)
+            {
+                var homeCell = Walls.WorldToCell(eyesHomeTarget.position);
+                if (cell == homeCell)
+                    ExitEyesModeInHouse();
+            }
+
+            // house verlaten (alleen als geen eyes)
+            if (!IsEyes && InHouse && Ghost_Room != null && !Ghost_Room.HasTile(cell))
+            {
+                InHouse = false;
+                CanExitHouse = false;
+            }
+
+            Vector2Int desiredDir;
+
+            if (IsEyes)
+                desiredDir = GetEyesDirToTargets_NoUTurn();
+            else
+                desiredDir = brain != null ? brain.GetDesiredDir(this) : Vector2Int.zero;
 
             if (CanMove(desiredDir))
-                SetDir(desiredDir);
+                CurrentDir = desiredDir;
 
-            // Als huidige richting niet meer kan: stop
             if (!CanMove(CurrentDir))
-                SetDir(Vector2Int.zero);
+                CurrentDir = Vector2Int.zero;
 
-            // Volgende tile target zetten
             if (CurrentDir != Vector2Int.zero)
             {
                 var currentCell = Walls.WorldToCell(transform.position);
@@ -169,24 +149,11 @@ public class GhostMovement : MonoBehaviour
             }
         }
 
-        /* =========================
-         * Beweging uitvoeren
-         * ========================= */
-
         if (pacman != null)
         {
             float speed = pacman.MoveSpeed * GetSpeedMultiplier();
-
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                TargetWorldPos,
-                speed * Time.deltaTime
-            );
+            transform.position = Vector3.MoveTowards(transform.position, TargetWorldPos, speed * Time.deltaTime);
         }
-
-        /* =========================
-         * Animatie updaten
-         * ========================= */
 
         if (animator != null)
         {
@@ -196,17 +163,72 @@ public class GhostMovement : MonoBehaviour
             animator.SetBool(
                 "IsFrightened",
                 modeController != null &&
-                modeController.CurrentMode == GhostMode.Frightened
+                modeController.CurrentMode == GhostMode.Frightened &&
+                !IsEyes
             );
         }
     }
 
-    /* =========================
-     * Mode-wissel handling
-     * ========================= */
+    /// <summary>
+    /// Wordt aangeroepen als Pac-Man deze ghost opeet.
+    /// We geven de deathWorldPos mee zodat eyes EXACT op die tile starten.
+    /// </summary>
+    public void EnterEyesMode(Vector3 deathWorldPos)
+    {
+        IsEyes = true;
+
+        InHouse = false;
+        CanExitHouse = true;
+        holdInHouseActive = false;
+
+        // ✅ onthoud death cell en snap eyes EXACT op die cell
+        deathCell = Walls.WorldToCell(deathWorldPos);
+        Vector3 start = Walls.GetCellCenterWorld(deathCell);
+        transform.position = start;
+        TargetWorldPos = start;
+
+        // start dir
+        if (CurrentDir == Vector2Int.zero)
+            CurrentDir = Vector2Int.up;
+
+        // warp cooldown (maar eyes warpen toch niet)
+        nextAllowedWarpTime = Time.time + 0.05f;
+
+        if (eyes != null)
+            eyes.ShowEyes();
+    }
+
+    private void ExitEyesModeInHouse()
+    {
+        IsEyes = false;
+
+        InHouse = true;
+
+        // even vasthouden
+        CanExitHouse = false;
+        holdInHouseActive = true;
+        StopAllCoroutines();
+        StartCoroutine(HoldInHouseRoutine(respawnHoldInHouseSeconds));
+
+        SnapToCellCenter();
+        CurrentDir = Vector2Int.zero;
+
+        if (eyes != null)
+            eyes.ShowBody();
+    }
+
+    private IEnumerator HoldInHouseRoutine(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        holdInHouseActive = false;
+        CanExitHouse = true;
+    }
 
     private void HandleModeChanged(GhostMode oldMode, GhostMode newMode)
     {
+        if (IsEyes) return;
+
         bool scatterChaseSwitch =
             (oldMode == GhostMode.Scatter && newMode == GhostMode.Chase) ||
             (oldMode == GhostMode.Chase && newMode == GhostMode.Scatter);
@@ -214,22 +236,119 @@ public class GhostMovement : MonoBehaviour
         if (!scatterChaseSwitch) return;
         if (CurrentDir == Vector2Int.zero) return;
 
-        SetDir(-CurrentDir);
+        CurrentDir = -CurrentDir;
 
         var currentCell = Walls.WorldToCell(TargetWorldPos);
         var nextCell = currentCell + new Vector3Int(CurrentDir.x, CurrentDir.y, 0);
         TargetWorldPos = Walls.GetCellCenterWorld(nextCell);
     }
 
-    /* =========================
-     * Helpers
-     * ========================= */
+    private void SnapToCellCenter()
+    {
+        var cell = Walls.WorldToCell(transform.position);
+        TargetWorldPos = Walls.GetCellCenterWorld(cell);
+        transform.position = TargetWorldPos;
+    }
 
-    private void SetDir(Vector2Int dir) => CurrentDir = dir;
+    private Vector2Int GetEyesDirToTargets_NoUTurn()
+    {
+        if (Walls == null || eyesHomeTarget == null)
+            return Vector2Int.up;
 
-    /* =========================
-     * Warp helpers
-     * ========================= */
+        var hereCell = Walls.WorldToCell(transform.position);
+        var homeCell = Walls.WorldToCell(eyesHomeTarget.position);
+
+        // Als we geen doorTarget hebben: direct naar home
+        bool useDoor = (eyesDoorTarget != null);
+        Vector3Int doorCell = useDoor ? Walls.WorldToCell(eyesDoorTarget.position) : new Vector3Int(int.MinValue, int.MinValue, 0);
+
+        // ✅ Belangrijk:
+        // - Zolang we NIET op de doorCell zijn: ga naar door
+        // - Zodra we OP de doorCell zijn: ga direct naar home
+        Vector3 goalPos;
+        if (useDoor && hereCell != doorCell)
+            goalPos = eyesDoorTarget.position;
+        else
+            goalPos = eyesHomeTarget.position;
+
+        Vector2Int[] dirs = new[]
+        {
+        Vector2Int.up,
+        Vector2Int.left,
+        Vector2Int.down,
+        Vector2Int.right
+    };
+
+        // reverse blokkeren voorkomt flippen
+        Vector2Int reverse = -CurrentDir;
+
+        float best = float.MaxValue;
+        Vector2Int bestDir = Vector2Int.zero;
+
+        // 1) zonder U-turn
+        foreach (var d in dirs)
+        {
+            if (d == reverse) continue;
+            if (!CanMove(d)) continue;
+
+            var nextCell = hereCell + new Vector3Int(d.x, d.y, 0);
+            Vector3 nextWorld = Walls.GetCellCenterWorld(nextCell);
+
+            float dist = (nextWorld - goalPos).sqrMagnitude;
+            if (dist < best)
+            {
+                best = dist;
+                bestDir = d;
+            }
+        }
+
+        // 2) als niets: U-turn toestaan
+        if (bestDir == Vector2Int.zero)
+        {
+            foreach (var d in dirs)
+            {
+                if (!CanMove(d)) continue;
+
+                var nextCell = hereCell + new Vector3Int(d.x, d.y, 0);
+                Vector3 nextWorld = Walls.GetCellCenterWorld(nextCell);
+
+                float dist = (nextWorld - goalPos).sqrMagnitude;
+                if (dist < best)
+                {
+                    best = dist;
+                    bestDir = d;
+                }
+            }
+        }
+
+        // ✅ Anti-stuck:
+        // Als we op de doorCell zijn en de beste richting brengt ons niet dichter bij home,
+        // forceer dan alsnog een stap richting home (als mogelijk).
+        if (useDoor && hereCell == doorCell)
+        {
+            // probeer een richting die afstand naar home verlaagt
+            float bestHome = float.MaxValue;
+            Vector2Int bestHomeDir = Vector2Int.zero;
+
+            foreach (var d in dirs)
+            {
+                if (!CanMove(d)) continue;
+                var nextCell = hereCell + new Vector3Int(d.x, d.y, 0);
+                float distHome = (Walls.GetCellCenterWorld(nextCell) - eyesHomeTarget.position).sqrMagnitude;
+
+                if (distHome < bestHome)
+                {
+                    bestHome = distHome;
+                    bestHomeDir = d;
+                }
+            }
+
+            if (bestHomeDir != Vector2Int.zero)
+                return bestHomeDir;
+        }
+
+        return bestDir;
+    }
 
     private void CacheWarpCellsFromMarkers()
     {
@@ -241,18 +360,13 @@ public class GhostMovement : MonoBehaviour
 
         leftWarpCell = Walls.WorldToCell(warpTileLeft.position);
         rightWarpCell = Walls.WorldToCell(warpTileRight.position);
-
-        if (leftWarpCell == rightWarpCell)
-        {
-            Debug.LogError($"{name}: Left/Right warp markers zitten op dezelfde cell: {leftWarpCell}. Zet ze op verschillende tiles.");
-        }
     }
 
-    /// <summary>
-    /// Als de ghost op een warp tile staat (tile-center moment), teleport naar de andere warp tile.
-    /// </summary>
     private bool ApplyWarpIfOnWarpTile()
     {
+        // ✅ extra safety
+        if (IsEyes) return false;
+
         if (Time.time < nextAllowedWarpTime) return false;
         if (leftWarpCell.x == int.MinValue || rightWarpCell.x == int.MinValue) return false;
 
@@ -273,47 +387,36 @@ public class GhostMovement : MonoBehaviour
         return true;
     }
 
-    /// <summary>
-    /// Check of de ghost die kant op kan (walls/door/room regels + warp exit).
-    /// </summary>
     public bool CanMove(Vector2Int dir)
     {
         if (dir == Vector2Int.zero) return false;
         if (Walls == null) return false;
 
         var currentCell = Walls.WorldToCell(transform.position);
-
-        // ✅ Warp-exit toestaan (classic)
-        if (leftWarpCell.x != int.MinValue && currentCell == leftWarpCell && dir == Vector2Int.left)
-            return true;
-
-        if (rightWarpCell.x != int.MinValue && currentCell == rightWarpCell && dir == Vector2Int.right)
-            return true;
-
         var nextCell = currentCell + new Vector3Int(dir.x, dir.y, 0);
 
-        // Walls blokkeren altijd
+        // ✅ Walls blokkeren altijd (ook eyes!)
         if (Walls.HasTile(nextCell)) return false;
 
-        // Ghost room: alleen blokkeren als je buiten bent
+        // ✅ Eyes negeert alleen room/door regels, maar NIET walls
+        if (IsEyes) return true;
+
         if (!InHouse && Ghost_Room != null && Ghost_Room.HasTile(nextCell))
             return false;
 
-        // Ghost door:
         if (Ghost_Door != null && Ghost_Door.HasTile(nextCell))
         {
-            if (InHouse && !CanExitHouse) return false; // In house: alleen door als release actief is
-            if (!InHouse) return false;                 // Buiten: nooit terug door de deur
+            if (InHouse && (holdInHouseActive || !CanExitHouse)) return false;
+            if (!InHouse) return false;
         }
 
         return true;
     }
 
-    /// <summary>
-    /// Bepaalt multiplier op basis van tile + mode.
-    /// </summary>
     private float GetSpeedMultiplier()
     {
+        if (IsEyes) return eyesMultiplier;
+
         if (Walls == null) return normalMultiplier;
 
         Vector3Int cell = Walls.WorldToCell(transform.position);

@@ -49,15 +49,15 @@ public class PacmanDeath : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (isDead || isGameOver) return;
+    //private void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    if (isDead || isGameOver) return;
 
-        if (other.CompareTag("Ghost"))
-            Die();
-    }
+    //    if (other.CompareTag("Ghost"))
+    //        Die();
+    //}
 
-    private void Die()
+    public void Die()
     {
         isDead = true;
         lives--;

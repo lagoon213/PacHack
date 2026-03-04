@@ -1,17 +1,27 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
 
- public static event System.Action OnPelletEaten;
+    public static event System.Action OnPelletEaten;
+
     public int score;
     public int highScore;
 
+    [Header("Pellets")]
     public Tilemap pelletTilemap;
     public int pelletsRemaining;
+
+    [Header("WIN FLOW (Sleep in Inspector)")]
+    [SerializeField] private WallsFlasher wallsFlasher; // sleep Walls (met WallsFlasher component) hierheen
+    [SerializeField] private GameObject winUI;          // sleep WinUI Panel hierheen
+    [SerializeField] private float freezeDelayBeforeFlash = 0.05f;
+
+    private bool winTriggered;
 
     private void Awake()
     {
@@ -41,22 +51,76 @@ public class ScoreManager : MonoBehaviour
 
     private void Start()
     {
-        // eerste scene
+        Time.timeScale = 1f;
         RefreshPelletTilemapAndCount();
+        RebindSceneReferences(); // ✅ belangrijk
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // na restart / scene reload
+        Time.timeScale = 1f;
+        winTriggered = false;
+
         RefreshPelletTilemapAndCount();
+        RebindSceneReferences(); // ✅ pak nieuwe scene refs
+    }
+
+    /// <summary>
+    /// Rebind WinUI + WallsFlasher bij elke scene load
+    /// zodat DontDestroy ScoreManager nooit "Missing" refs houdt.
+    /// </summary>
+    private void RebindSceneReferences()
+    {
+        // --- WinUI ---
+        // Als je WinUI in de scene zit: sleep hem 1x, maar bij reload wordt dat Missing.
+        // Daarom: als winUI missing/null => zoek een object met component WinUI tag of naam? (zonder naam: via Canvas child)
+        if (winUI == null)
+        {
+            // Zoek in alle canvassen een child die "WinUI" heet (fallback)
+            // (werkt ook als je meerdere canvassen hebt)
+            var canvases = FindObjectsOfType<Canvas>(true);
+            foreach (var c in canvases)
+            {
+                var t = c.transform.Find("WinUI");
+                if (t != null)
+                {
+                    winUI = t.gameObject;
+                    break;
+                }
+            }
+        }
+
+        if (winUI != null)
+        {
+            winUI.SetActive(false);
+            Debug.Log("ScoreManager: WinUI gekoppeld ✅");
+        }
+        else
+        {
+            Debug.LogWarning("ScoreManager: WinUI is NIET gekoppeld. Sleep je WinUI panel in ScoreManager óf zorg dat hij onder Canvas/WinUI heet.");
+        }
+
+        // --- WallsFlasher ---
+        if (wallsFlasher == null)
+        {
+            wallsFlasher = FindObjectOfType<WallsFlasher>(true);
+        }
+
+        if (wallsFlasher != null)
+        {
+            Debug.Log("ScoreManager: WallsFlasher gekoppeld ✅");
+        }
+        else
+        {
+            Debug.LogWarning("ScoreManager: WallsFlasher niet gevonden. Zet WallsFlasher op je Walls Tilemap en sleep hem in ScoreManager.");
+        }
     }
 
     private void RefreshPelletTilemapAndCount()
     {
-        // Zoek opnieuw de pellet tilemap als die missing is
         if (pelletTilemap == null)
         {
-            var go = GameObject.Find("Pellets"); // zet dit gelijk aan jouw GameObject naam
+            var go = GameObject.Find("Pellets");
             if (go != null)
                 pelletTilemap = go.GetComponent<Tilemap>();
         }
@@ -78,11 +142,6 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    public void ResetScore()
-    {
-        score = 0;
-    }
-
     private void CountPellets()
     {
         pelletsRemaining = 0;
@@ -98,22 +157,21 @@ public class ScoreManager : MonoBehaviour
         Debug.Log("Pellets found: " + pelletsRemaining);
     }
 
-    // 🟡 SINGLE SOURCE OF TRUTH
+    // SINGLE SOURCE OF TRUTH
     public void PelletEaten(Vector3 worldPosition)
     {
+        if (winTriggered) return;
+
         Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
 
         if (!pelletTilemap.HasTile(cellPos))
             return;
 
-        // Remove pellet
         pelletTilemap.SetTile(cellPos, null);
         pelletsRemaining--;
 
-        // Add score
         AddScore(10);
 
-        // 🔔 Notify listeners (ghost release, etc)
         OnPelletEaten?.Invoke();
 
         if (pelletsRemaining <= 0)
@@ -122,6 +180,49 @@ public class ScoreManager : MonoBehaviour
 
     private void WinLevel()
     {
-        Debug.Log("YOU WIN");
+        if (winTriggered) return;
+        winTriggered = true;
+
+        Debug.Log("YOU WIN -> Start WinSequence");
+        StartCoroutine(WinSequence());
+    }
+
+    private IEnumerator WinSequence()
+    {
+        FreezeGameplay(true);
+
+        yield return new WaitForSecondsRealtime(freezeDelayBeforeFlash);
+
+        if (wallsFlasher != null)
+            yield return StartCoroutine(wallsFlasher.FlashWhiteBlueRoutine());
+        else
+            Debug.LogError("ScoreManager: wallsFlasher = NULL, geen flash.");
+
+        if (winUI != null)
+        {
+            winUI.SetActive(true);
+            Debug.Log("ScoreManager: WinUI actief ✅");
+        }
+        else
+        {
+            Debug.LogError("ScoreManager: winUI = NULL, geen win UI.");
+        }
+
+        Time.timeScale = 0f;
+    }
+
+    private void FreezeGameplay(bool freeze)
+    {
+        var pac = FindObjectOfType<PacManMovement>(true);
+        if (pac != null) pac.enabled = !freeze;
+
+        var pacDeath = FindObjectOfType<PacmanDeath>(true);
+        if (pacDeath != null) pacDeath.enabled = !freeze;
+
+        foreach (var g in FindObjectsOfType<GhostMovement>(true))
+            g.enabled = !freeze;
+
+        foreach (var g in FindObjectsOfType<GhostEatable>(true))
+            g.enabled = !freeze;
     }
 }

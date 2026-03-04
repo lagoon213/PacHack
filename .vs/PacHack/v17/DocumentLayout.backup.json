@@ -3,16 +3,56 @@
   "WorkspaceRootPath": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\fadein.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\fadein.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|c:\\users\\jesse\\documents\\ict\\game design\\pachack\\assets\\scripts\\scoredisplay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\scoredisplay.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|c:\\users\\jesse\\documents\\ict\\game design\\pachack\\assets\\scripts\\ghostscripts\\ghosteyes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghosteyes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\ghostscripts\\ghostmovement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghostmovement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\ghostscripts\\ghosteatable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghosteatable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\ghostscripts\\ghosthousereleasecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghosthousereleasecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\pacmanscripts\\pacmanmovement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pacmanscripts\\pacmanmovement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|c:\\users\\jesse\\documents\\ict\\game design\\pachack\\assets\\scripts\\pacmanscripts\\pacmandeath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\ghostscripts\\ghostrespawnrunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghostrespawnrunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\pacmanscripts\\pacmandeath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pacmanscripts\\pacmandeath.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\ghostscripts\\ghostmodecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghostmodecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\ghostscripts\\ghostmode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\ghostscripts\\ghostmode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\pacmanscripts\\powerpelletpickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pacmanscripts\\powerpelletpickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\scoremanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\scoremanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\fadein.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\fadein.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E1F075A9-2F33-D45C-5476-B694BAD55328}|Assembly-CSharp.csproj|C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\assets\\scripts\\gameovermenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -43,6 +83,69 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "ScoreDisplay.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\ScoreDisplay.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ScoreDisplay.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\ScoreDisplay.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ScoreDisplay.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T09:10:06.462Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GhostEyes.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostEyes.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostEyes.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostEyes.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostEyes.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:45:11.147Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GhostMovement.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostMovement.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostMovement.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostMovement.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostMovement.cs",
+              "ViewState": "AgIAAJUBAAAAAAAAAAAqwLoBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:21:13.669Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "GhostRespawnRunner.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostRespawnRunner.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostRespawnRunner.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostRespawnRunner.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostRespawnRunner.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAcwC0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T12:00:32.284Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ScoreManager.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\ScoreManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ScoreManager.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\ScoreManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ScoreManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-27T10:07:23.36Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
               "Title": "FadeIn.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\FadeIn.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\FadeIn.cs",
@@ -50,12 +153,11 @@
               "RelativeToolTip": "Assets\\Scripts\\FadeIn.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-27T08:06:02.513Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-27T08:06:02.513Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 15,
               "Title": "Button.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs",
               "RelativeDocumentMoniker": "Library\\PackageCache\\com.unity.ugui@b9d1dd437cb9\\Runtime\\UGUI\\UI\\Core\\Button.cs",
@@ -67,7 +169,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 13,
               "Title": "GameOverMenu.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GameOverMenu.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameOverMenu.cs",
@@ -79,7 +181,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 14,
               "Title": "WallFlasher.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\WallFlasher.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\WallFlasher.cs",
@@ -91,33 +193,91 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
+              "Title": "GhostEatable.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostEatable.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostEatable.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostEatable.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostEatable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:08:16.435Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "GhostHouseReleaseController.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostHouseReleaseController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostHouseReleaseController.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostHouseReleaseController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostHouseReleaseController.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAADwvzAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:23:57.241Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "GhostModeController.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostModeController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostModeController.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostModeController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostModeController.cs",
+              "ViewState": "AgIAAHwAAAAAAAAAAAAiwJ8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:05:18.186Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "PacmanDeath.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
               "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
               "RelativeToolTip": "Assets\\Scripts\\PacManScripts\\PacmanDeath.cs",
-              "ViewState": "AgIAAEEAAAAAAAAAAAAgwFQAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAACUAAAAAAAAAAAAkwDsAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-23T09:15:02.796Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-23T09:15:02.796Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "PacManMovement.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
               "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
               "RelativeToolTip": "Assets\\Scripts\\PacManScripts\\PacManMovement.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAuwHgAAAAtAAAAAAAAAA==",
+              "ViewState": "AgIAAOcAAAAAAAAAAAAcwAoBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-23T08:51:39.646Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-23T08:51:39.646Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 10,
+              "Title": "PowerPelletPickup.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PowerPelletPickup.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PacManScripts\\PowerPelletPickup.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PacManScripts\\PowerPelletPickup.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PacManScripts\\PowerPelletPickup.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAmwCAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:03:26.248Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "GhostMode.cs",
+              "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostMode.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GhostScripts\\GhostMode.cs",
+              "ToolTip": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\GhostScripts\\GhostMode.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GhostScripts\\GhostMode.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAAwBIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-02T10:05:12.877Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
               "Title": "PowerPelletBlinkTilemap.cs",
               "DocumentMoniker": "C:\\Users\\jesse\\Documents\\ICT\\Game Design\\PacHack\\Assets\\Scripts\\PowerPelletBlinkTilemap.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PowerPelletBlinkTilemap.cs",
