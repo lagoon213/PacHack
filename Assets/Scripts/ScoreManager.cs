@@ -1,19 +1,22 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
+using System;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
 
-    // Global pellet event (ghosts listen to this)
-    public static event System.Action OnPelletEaten;
+    public static event Action OnPelletEaten;
+    public static event Action OnSnakeGrow;
 
     public int score;
     public int highScore;
 
-    [Header("Pellet Tilemap")]
     public Tilemap pelletTilemap;
     public int pelletsRemaining;
+
+    private int pelletsSinceGrow = 0;
 
     private void Awake()
     {
@@ -31,9 +34,40 @@ public class ScoreManager : MonoBehaviour
         highScore = PlayerPrefs.GetInt("HighScore", 0);
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     private void Start()
     {
-        CountPellets();
+        RefreshPelletTilemapAndCount();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        RefreshPelletTilemapAndCount();
+        pelletsSinceGrow = 0;
+    }
+
+    private void RefreshPelletTilemapAndCount()
+    {
+        if (pelletTilemap == null)
+        {
+            var go = GameObject.Find("Pellets");
+            if (go != null)
+                pelletTilemap = go.GetComponent<Tilemap>();
+        }
+
+        if (pelletTilemap != null)
+            CountPellets();
+        else
+            Debug.LogWarning("ScoreManager: pelletTilemap not found. Check GameObject name ('Pellets').");
     }
 
     public void AddScore(int amount)
@@ -50,12 +84,12 @@ public class ScoreManager : MonoBehaviour
     public void ResetScore()
     {
         score = 0;
+        pelletsSinceGrow = 0;
     }
 
     private void CountPellets()
     {
         pelletsRemaining = 0;
-
         BoundsInt bounds = pelletTilemap.cellBounds;
 
         foreach (Vector3Int pos in bounds.allPositionsWithin)
@@ -67,7 +101,6 @@ public class ScoreManager : MonoBehaviour
         Debug.Log("Pellets found: " + pelletsRemaining);
     }
 
-    // 🟡 SINGLE SOURCE OF TRUTH
     public void PelletEaten(Vector3 worldPosition)
     {
         Vector3Int cellPos = pelletTilemap.WorldToCell(worldPosition);
@@ -75,15 +108,20 @@ public class ScoreManager : MonoBehaviour
         if (!pelletTilemap.HasTile(cellPos))
             return;
 
-        // Remove pellet
         pelletTilemap.SetTile(cellPos, null);
         pelletsRemaining--;
 
-        // Add score
         AddScore(10);
 
-        // 🔔 Notify listeners (ghost release, etc)
         OnPelletEaten?.Invoke();
+
+        // Snake growth every 10 pellets
+        pelletsSinceGrow++;
+        if (pelletsSinceGrow >= 10)
+        {
+            pelletsSinceGrow = 0;
+            OnSnakeGrow?.Invoke();
+        }
 
         if (pelletsRemaining <= 0)
             WinLevel();

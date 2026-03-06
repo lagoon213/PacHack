@@ -1,23 +1,12 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
-/// <summary>
-/// Pac-Man movement (tile-based).
-///
-/// Doet:
-/// - grid movement + input (New Input System)
-/// - botsing met walls/ghost house
-/// - pellets opeten
-/// - visual draaien + animatie pauzeren
-/// - tunnel warp via 2 markers (GameObjects) op warp tile posities
-///
-/// Pac-Man speed is de basis voor ghost speed.
-/// </summary>
 public class PacManMovement : MonoBehaviour
 {
     /* =========================
-     * Referenties
+     * References
      * ========================= */
 
     [SerializeField] private Animator animator;
@@ -33,32 +22,26 @@ public class PacManMovement : MonoBehaviour
     public Tilemap Pellets;
 
     /* =========================
-     * Warp markers (GameObjects)
+     * Warp markers
      * ========================= */
 
-    [Header("Warp Markers (GameObjects on tile centers)")]
+    [Header("Warp Markers")]
     [SerializeField] private Transform warpTileLeft;
     [SerializeField] private Transform warpTileRight;
 
     /* =========================
-     * Movement settings
+     * Movement
      * ========================= */
 
     [SerializeField] private float moveSpeed = 5f;
-
-    /// <summary>
-    /// Pac-Man snelheid (ghosts gebruiken dit als baseline).
-    /// </summary>
     public float MoveSpeed => moveSpeed;
 
     /* =========================
-     * Warp settings
+     * Warp
      * ========================= */
 
-    [Header("Tunnel Warp Settings")]
     [SerializeField] private float warpCooldown = 0.12f;
 
-    // Deze cells zijn in WALLS cell-space
     private Vector3Int leftWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
     private Vector3Int rightWarpCell = new Vector3Int(int.MinValue, int.MinValue, 0);
     private float nextAllowedWarpTime;
@@ -70,82 +53,181 @@ public class PacManMovement : MonoBehaviour
     private Vector2Int _currentDir = Vector2Int.right;
     private Vector2Int _desiredDir = Vector2Int.right;
     private Vector2 _moveInput;
+
     private Vector3 _targetWorldPos;
 
     /* =========================
-     * Unity lifecycle
+     * Snake system
+     * ========================= */
+
+    [Header("Snake")]
+    [SerializeField] private GameObject snakeBodyPrefab;
+
+    private List<GameObject> snakeSegments = new List<GameObject>();
+    private List<Vector3Int> moveHistory = new List<Vector3Int>();
+
+    private Vector3Int previousTile;
+
+    private int pelletsUntilGrowth = 10;
+
+    public Vector3 LastMoveDirection { get; private set; } = Vector3.right;
+    public bool snakeMode;
+
+    /* =========================
+     * Start
      * ========================= */
 
     private void Start()
     {
         if (Walls == null)
         {
-            Debug.LogError($"{name}: Walls tilemap ontbreekt!");
+            Debug.LogError($"{name}: Walls tilemap missing!");
             enabled = false;
             return;
         }
 
-        // Start in het midden van de tile
         var cell = Walls.WorldToCell(transform.position);
         _targetWorldPos = Walls.GetCellCenterWorld(cell);
         transform.position = _targetWorldPos;
 
         CacheWarpCellsFromMarkers();
+
+        previousTile = cell;
+        moveHistory.Add(previousTile);
     }
+
+    /* =========================
+     * Update
+     * ========================= */
 
     private void Update()
     {
         ReadInput();
 
-        // Alleen wisselen als we tile-center bereikt hebben
         if (Vector3.Distance(transform.position, _targetWorldPos) < 0.001f)
         {
-            transform.position = _targetWorldPos;
+            var currentTile = Walls.WorldToCell(transform.position);
 
-            // ✅ Warp toepassen op tile-center moment
-            // Als we warpen: frame stoppen zodat target berekening schoon opnieuw gebeurt.
+            /* ===== Snake path tracking ===== */
+
+            if (currentTile != previousTile)
+            {
+                moveHistory.Insert(0, currentTile);
+                previousTile = currentTile;
+
+                UpdateSnakeSegments();
+                CheckSelfCollision();
+
+                int maxHistory = snakeSegments.Count + 5;
+
+                if (moveHistory.Count > maxHistory)
+                    moveHistory.RemoveAt(moveHistory.Count - 1);
+            }           
+
+            /* ===== Warp ===== */
+
             if (ApplyWarpIfOnWarpTile())
                 return;
 
-            // Probeer gewenste richting toe te passen
+            /* ===== Direction ===== */
+
             if (CanMove(_desiredDir))
                 _currentDir = _desiredDir;
 
-            // Als je niet meer vooruit kan: stop
             if (!CanMove(_currentDir))
                 _currentDir = Vector2Int.zero;
 
-            // Volgende tile target zetten
             if (_currentDir != Vector2Int.zero)
             {
                 var currentCell = Walls.WorldToCell(transform.position);
                 var nextCell = currentCell + new Vector3Int(_currentDir.x, _currentDir.y, 0);
+
                 _targetWorldPos = Walls.GetCellCenterWorld(nextCell);
+
+                LastMoveDirection = new Vector3(_currentDir.x, _currentDir.y, 0).normalized;
             }
 
-            // Pellets opeten
-             var pelletCell = Pellets.WorldToCell(transform.position);
+            /* ===== Pellets ===== */
+
+            var pelletCell = Pellets.WorldToCell(transform.position);
+
             if (Pellets.HasTile(pelletCell))
             {
-                //Pellets.SetTile(pelletCell, null);
-                ScoreManager.Instance.AddScore(10); //feel like this logic should be in pellet
+                ScoreManager.Instance.AddScore(10);
                 ScoreManager.Instance.PelletEaten(transform.position);
+
+                pelletsUntilGrowth--;
+
+                if (pelletsUntilGrowth <= 0)
+                {
+                    pelletsUntilGrowth = 10;
+                    SpawnNewSegment();
+                }
             }
         }
 
-        // Beweging uitvoeren
+        /* ===== Movement ===== */
+
         transform.position = Vector3.MoveTowards(
             transform.position,
             _targetWorldPos,
             moveSpeed * Time.deltaTime
         );
 
-        // Visual + animatie
         UpdateFacing();
 
         bool isMoving = _currentDir != Vector2Int.zero;
+
         if (animator != null)
             animator.speed = isMoving ? 1f : 0f;
+    }
+
+    /* =========================
+     * Snake
+     * ========================= */
+    private void CheckSelfCollision()
+{
+    Vector3Int headTile = Walls.WorldToCell(transform.position);
+
+    foreach (GameObject segment in snakeSegments)
+    {
+        Vector3Int segmentTile = Walls.WorldToCell(segment.transform.position);
+
+        if (segmentTile == headTile)
+        {
+            //death logic method
+            Debug.LogWarning("YOU DIED");
+            return;
+        }
+    }
+}
+    private void UpdateSnakeSegments()
+    {
+        for (int i = 0; i < snakeSegments.Count; i++)
+        {
+            if (i + 1 >= moveHistory.Count)
+                return;
+
+            Vector3Int tile = moveHistory[i + 1];
+            Vector3 pos = Walls.GetCellCenterWorld(tile);
+
+            snakeSegments[i].transform.position = pos;
+        }
+    }
+
+    private void SpawnNewSegment()
+    {
+        Vector3Int spawnTile;
+
+        if (moveHistory.Count > snakeSegments.Count + 1)
+            spawnTile = moveHistory[snakeSegments.Count + 1];
+        else
+            spawnTile = moveHistory[moveHistory.Count - 1];
+
+        Vector3 pos = Walls.GetCellCenterWorld(spawnTile);
+
+        GameObject segment = Instantiate(snakeBodyPrefab, pos, Quaternion.identity);
+        snakeSegments.Add(segment);
     }
 
     /* =========================
@@ -156,53 +238,62 @@ public class PacManMovement : MonoBehaviour
     {
         _moveInput = value.Get<Vector2>();
     }
-
+/*
     private void ReadInput()
     {
         int x = Mathf.RoundToInt(_moveInput.x);
         int y = Mathf.RoundToInt(_moveInput.y);
 
-        // Geen diagonaal (horizontaal wint)
         if (x != 0) y = 0;
 
         if (x != 0 || y != 0)
             _desiredDir = new Vector2Int(x, y);
+
+    }
+    */
+   private void ReadInput()
+{
+    int x = Mathf.RoundToInt(_moveInput.x);
+    int y = Mathf.RoundToInt(_moveInput.y);
+
+    if (x != 0) y = 0;
+
+    Vector2Int newDir = new Vector2Int(x, y);
+
+    if (newDir == Vector2Int.zero)
+        return;
+
+    if (snakeMode)
+    {
+        Vector2Int lastDir = new Vector2Int(
+            Mathf.RoundToInt(LastMoveDirection.x),
+            Mathf.RoundToInt(LastMoveDirection.y)
+        );
+
+        if (newDir == -lastDir)
+            return;
     }
 
+    _desiredDir = newDir;
+}
+
     /* =========================
-     * Warp helpers
+     * Warp
      * ========================= */
 
     private void CacheWarpCellsFromMarkers()
     {
         if (warpTileLeft == null || warpTileRight == null)
-        {
-            Debug.LogWarning($"{name}: Warp markers missen. Sleep warpTileLeft en warpTileRight in de inspector.");
             return;
-        }
 
-        // We nemen de marker worldpos en zetten die om naar Walls cell-space
         leftWarpCell = Walls.WorldToCell(warpTileLeft.position);
         rightWarpCell = Walls.WorldToCell(warpTileRight.position);
-
-        // Extra veilig: snap markers naar cell centers (optioneel)
-        // warpTileLeft.position = Walls.GetCellCenterWorld(leftWarpCell);
-        // warpTileRight.position = Walls.GetCellCenterWorld(rightWarpCell);
-
-        if (leftWarpCell == rightWarpCell)
-        {
-            Debug.LogError($"{name}: Left/Right warp markers zitten op dezelfde cell: {leftWarpCell}. Zet ze op verschillende tiles.");
-        }
-        else
-        {
-            Debug.Log($"{name}: WarpCells (Walls) Left={leftWarpCell}, Right={rightWarpCell}");
-        }
     }
 
     private bool ApplyWarpIfOnWarpTile()
     {
-        if (Time.time < nextAllowedWarpTime) return false;
-        if (leftWarpCell.x == int.MinValue || rightWarpCell.x == int.MinValue) return false;
+        if (Time.time < nextAllowedWarpTime)
+            return false;
 
         var cell = Walls.WorldToCell(transform.position);
 
@@ -222,17 +313,16 @@ public class PacManMovement : MonoBehaviour
     }
 
     /* =========================
-     * Movement helpers
+     * Movement
      * ========================= */
 
     private bool CanMove(Vector2Int dir)
     {
-        if (dir == Vector2Int.zero) return false;
-        if (Walls == null) return false;
+        if (dir == Vector2Int.zero)
+            return false;
 
         var currentCell = Walls.WorldToCell(transform.position);
 
-        // ✅ Warp-exit toestaan (classic)
         if (leftWarpCell.x != int.MinValue && currentCell == leftWarpCell && dir == Vector2Int.left)
             return true;
 
@@ -251,7 +341,8 @@ public class PacManMovement : MonoBehaviour
 
     private void UpdateFacing()
     {
-        if (visual == null) return;
+        if (visual == null)
+            return;
 
         if (_currentDir == Vector2Int.right)
             visual.rotation = Quaternion.Euler(0, 0, 0);
