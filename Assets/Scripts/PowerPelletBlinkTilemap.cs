@@ -17,7 +17,8 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
     /* =========================
      * Referenties & instellingen
      * ========================= */
-
+    //snake
+    [SerializeField] private PacManMovement pacMan; //reference to pacman movement not very clean but as a test
     /// <summary>
     /// Tilemap met power pellets.
     /// </summary>
@@ -86,6 +87,11 @@ public class PowerPelletBlinkTilemap : MonoBehaviour
 
         // Visueel verwijderen
         powerPelletTilemap.SetTile(cell, null);
+
+        if (pacMan != null && pacMan.snakeMode == true)
+        {
+            //some logic in ghost that allows the ghost to grow
+        }
     }
 
     /* =========================

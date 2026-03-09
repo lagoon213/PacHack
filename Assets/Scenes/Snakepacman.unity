@@ -3133,7 +3133,7 @@ PrefabInstance:
     - target: {fileID: 6942634338767650459, guid: 5d3eede68e466f7489a12b22cb6493c5, type: 3}
       propertyPath: snakeBodyPrefab
       value: 
-      objectReference: {fileID: 7132251096379637290, guid: d67340f3644a09d4c884ef85035168d9, type: 3}
+      objectReference: {fileID: 702962122376708727, guid: 9c75ff9cb12e4ff4cb7e447bc1af35ef, type: 3}
     - target: {fileID: 6942634338767650459, guid: 5d3eede68e466f7489a12b22cb6493c5, type: 3}
       propertyPath: snakeBodySprite
       value: 
